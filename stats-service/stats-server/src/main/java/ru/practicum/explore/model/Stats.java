@@ -1,26 +1,18 @@
 package ru.practicum.explore.model;
 
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
-import javax.persistence.*;
-import java.util.List;
-
-@Entity
-@Getter
-@Setter
+@Data
 @Builder
-@ToString
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "stats")
 public class Stats {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
     private String app;
     private String uri;
-    private Integer hits;
-//    private List<Hit> hitList;
+    private Long hits;
 
 }

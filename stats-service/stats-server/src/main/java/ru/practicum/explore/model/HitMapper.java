@@ -2,6 +2,7 @@ package ru.practicum.explore.model;
 
 import lombok.NoArgsConstructor;
 import ru.practicum.explore.HitDto;
+import ru.practicum.explore.StatsDto;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -14,16 +15,25 @@ public class HitMapper {
                 .app(hitDto.getApp())
                 .uri(hitDto.getUri())
                 .ip(hitDto.getIp())
-                .datetime(parseDate(hitDto.getDatetime()))
+                .datetime(parseDate(hitDto.getTimestamp()))
                 .build();
     }
 
     public static HitDto toHitDto(Hit hit) {
         return HitDto.builder()
+                .id(hit.getId())
                 .app(hit.getApp())
                 .uri(hit.getUri())
                 .ip(hit.getIp())
-                .datetime(hit.getDatetime().toString())
+                .timestamp(hit.getDatetime().toString())
+                .build();
+    }
+
+    public static StatsDto toStatsDto(Stats stats) {
+        return StatsDto.builder()
+                .app(stats.getApp())
+                .uri(stats.getUri())
+                .hits(stats.getHits())
                 .build();
     }
 

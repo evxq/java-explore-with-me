@@ -10,6 +10,7 @@ import ru.practicum.explore.model.Stats;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -17,24 +18,10 @@ import java.util.List;
 public class StatServiceImpl implements StatService {
 
     private final HitRepository hitRepository;
-    private final StatsRepository statsRepository;
 
     @Override
     public HitDto addHit(HitDto hitDto) {
-        Stats stat = statsRepository.findByAppAndUri(hitDto.getApp(), hitDto.getUri());
-        if (stat != null) {
-            stat.setHits(stat.getHits() + 1);
-        } else {
-            stat = Stats.builder()
-                    .app(hitDto.getApp())
-                    .uri(hitDto.getUri())
-                    .hits(1).build();
-        }
-        Stats savedStats = statsRepository.save(stat);
-        log.info("Обновлен Stats id={}", savedStats.getId());
-        Hit hit = HitMapper.toHit(hitDto);
-        hit.setStats(savedStats);
-        Hit savedHit = hitRepository.save(hit);
+        Hit savedHit = hitRepository.save(HitMapper.toHit(hitDto));
         log.info("Создан Hit id={}", savedHit.getId());
 
         return HitMapper.toHitDto(savedHit);
@@ -42,24 +29,25 @@ public class StatServiceImpl implements StatService {
 
     @Override
     public List<StatsDto> getStats(String start, String end, List<String> uris, Boolean unique) {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-        LocalDateTime from = LocalDateTime.from(formatter.parse(start));
-        LocalDateTime to = LocalDateTime.from(formatter.parse(end));
-        List<Stats> statList;
-
-        if (uris == null && !unique) {
-            statList = statsRepository.findAllByDatetimeBetween(from, to);
+        List<Stats> statList = null;
+        if (uris == null && !unique) {                                                                                  // ТЕСТ 1.2
+            statList = hitRepository.findStatsByDatetimeBetween(formatDate(start), formatDate(end));                    // только начало и конец, unique=false
         }
-
-        if (uris != null) {
-            for (String uri : uris) {
-                statsRepository.
-
-            }
+        if (uris != null && (unique == null || !unique)) {                                                              // ТЕСТЫ 1.1 / 2.1 / 3.1 / 3.2
+            statList = hitRepository.findStatsByDatetimeBetweenAndUriIn(formatDate(start), formatDate(end), uris);      // начало и конец, uri != null, unique=false
         }
-
-        return null;
+        if (uris == null && unique) {
+            statList = hitRepository.findStatsByDistinctIp(formatDate(start), formatDate(end));                         // начало и конец, unique=true
+        }
+        if (uris != null && Boolean.TRUE.equals(unique)) {                                                              // ТЕСТ 2.2
+            statList = hitRepository.findStatsByUriDistinctIp(formatDate(start), formatDate(end), uris);                // все параметры
+        }
+        return statList.stream().map(HitMapper::toStatsDto).collect(Collectors.toList());
     }
 
+    private LocalDateTime formatDate(String date) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        return LocalDateTime.from(formatter.parse(date));
+    }
 
 }

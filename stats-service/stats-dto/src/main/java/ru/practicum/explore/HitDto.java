@@ -12,7 +12,7 @@ import javax.validation.constraints.NotNull;
 @AllArgsConstructor
 public class HitDto {
 
-    private Integer id;
+    private Long id;
 
     @NotBlank(message = "Название сервиса не должно быть пустым")
     private String app;
@@ -24,6 +24,6 @@ public class HitDto {
     private String ip;
 
     @NotNull(message = "Дата запроса не может быть пустой")
-    private String datetime;
+    private String timestamp;
 
 }

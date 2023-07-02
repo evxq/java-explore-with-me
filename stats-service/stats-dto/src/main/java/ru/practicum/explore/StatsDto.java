@@ -17,6 +17,6 @@ public class StatsDto {
     @NotBlank(message = "uri запроса не должно быть пустым")
     private String uri;
 
-    private Integer hits;
+    private Long hits;
 
 }

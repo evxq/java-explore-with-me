@@ -18,12 +18,10 @@ public class StatController {
     }
 
     @GetMapping("/stats")
-    public List<StatsDto> getStats(//@RequestParam("start") @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") LocalDateTime start,
-                                   //@RequestParam("end") @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") LocalDateTime end
-                                   @RequestParam String start,
+    public List<StatsDto> getStats(@RequestParam String start,
                                    @RequestParam String end,
                                    @RequestParam(required = false) List<String> uris,
-                                   @RequestParam(defaultValue = "false") Boolean unique) {
+                                   @RequestParam(required = false) Boolean unique) {
         return statService.getStats(start, end, uris, unique);
     }
 
