@@ -1,19 +1,20 @@
 version: '3.1'
 services:
   stats-server:
-    build: ./stats-service
-    image: stats_service
-    container_name: stats_cont
+    build: ./stats-service/stats-server   # указание на модуль сервера (?)
+    image: stats_service_image
+    container_name: stats_service_cont
     ports:
       - "9090:9090"
     depends_on:
       - stats-db
     environment:
-      - DB_NAME=stats
+      - DB_NAME=stat_db
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=iamroot
-      - DB_HOST=db
+      - DB_HOST=stats-db
       - DB_PORT=5432
+#      - SPRING_DATASOURCE_URL=jdbc:postgresql://stats-db:5432/stat_db
 
   stats-db:
     image: postgres:14-alpine
@@ -21,7 +22,7 @@ services:
     ports:
       - "6541:5432"
     environment:
-      - POSTGRES_DB=stats
+      - POSTGRES_DB=stat_db
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=iamroot
 
@@ -38,8 +39,6 @@ services:
 #      - DB_NAME=main
 #      - POSTGRES_USER=postgres
 #      - POSTGRES_PASSWORD=iamroot
-#      - DB_HOST=
-#      - DB_PORT=
 
 #  ewm-db:
 #    image: postgres:14-alpine
