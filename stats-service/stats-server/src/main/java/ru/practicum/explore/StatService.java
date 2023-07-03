@@ -1,5 +1,8 @@
 package ru.practicum.explore;
 
+import ru.practicum.statsdto.dto.HitDto;
+import ru.practicum.statsdto.dto.StatsDto;
+
 import java.util.List;
 
 public interface StatService {

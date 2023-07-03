@@ -2,6 +2,8 @@ package ru.practicum.explore;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
+import ru.practicum.statsdto.dto.HitDto;
+import ru.practicum.statsdto.dto.StatsDto;
 
 import java.util.List;
 

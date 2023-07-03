@@ -1,8 +1,8 @@
 package ru.practicum.explore.model;
 
 import lombok.NoArgsConstructor;
-import ru.practicum.explore.HitDto;
-import ru.practicum.explore.StatsDto;
+import ru.practicum.statsdto.dto.HitDto;
+import ru.practicum.statsdto.dto.StatsDto;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
