@@ -1,6 +1,8 @@
-package ru.practicum.explore.model;
+package ru.practicum.explore.mapper;
 
 import lombok.NoArgsConstructor;
+import ru.practicum.explore.model.Hit;
+import ru.practicum.explore.model.Stats;
 import ru.practicum.statsdto.dto.HitDto;
 import ru.practicum.statsdto.dto.StatsDto;
 

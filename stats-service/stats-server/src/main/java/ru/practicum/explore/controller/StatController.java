@@ -1,7 +1,8 @@
-package ru.practicum.explore;
+package ru.practicum.explore.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
+import ru.practicum.explore.service.StatService;
 import ru.practicum.statsdto.dto.HitDto;
 import ru.practicum.statsdto.dto.StatsDto;
 
