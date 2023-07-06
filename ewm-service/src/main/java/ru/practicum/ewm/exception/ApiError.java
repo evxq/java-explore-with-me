@@ -1,0 +1,26 @@
+package ru.practicum.ewm.exception;
+
+import lombok.Builder;
+import org.springframework.http.HttpStatus;
+
+import java.time.LocalDateTime;
+import java.util.List;
+
+@Builder
+public class ApiError {
+
+    private final HttpStatus status;
+    private final String reason;
+    private final String message;
+    private final List<String> errors;
+    private final LocalDateTime timestamp;
+
+    public ApiError(HttpStatus status, String reason, String message, List<String> errors, LocalDateTime timestamp) {
+        this.status = status;
+        this.reason = reason;
+        this.message = message;
+        this.errors = errors;
+        this.timestamp = timestamp;
+    }
+
+}

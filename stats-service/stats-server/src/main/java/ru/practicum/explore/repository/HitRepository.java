@@ -1,4 +1,4 @@
-package ru.practicum.explore.dao;
+package ru.practicum.explore.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
