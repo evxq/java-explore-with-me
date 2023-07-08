@@ -10,6 +10,7 @@ import ru.practicum.ewm.user.dto.UserDto;
 import ru.practicum.ewm.user.model.User;
 import ru.practicum.ewm.utility.PageDefinition;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -31,7 +32,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public List<UserDto> getRequiredUsers(List<Long> ids, Integer from, Integer size) {
-        List<UserDto> userList = null;
+        List<UserDto> userList = new ArrayList<>();                                         // ПУСТОЙ СПИСОК ЕСЛИ НИЧЕГО НЕ НАЙДЕНО??
         if (ids == null && from != null && size != null) {
             userList = userRepository.findAll(PageDefinition.definePage(from, size))
                     .stream().map(UserMapper::toUserDto).collect(Collectors.toList());
