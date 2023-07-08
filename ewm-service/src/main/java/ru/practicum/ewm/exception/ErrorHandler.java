@@ -34,12 +34,48 @@ public class ErrorHandler {
     }
 
     @ExceptionHandler
+    @ResponseStatus(HttpStatus.BAD_REQUEST)                                                                     // 400
+    public ApiError handleWrongRequestError(final WrongRequestException e) {
+        log.info("400 {}", e.getMessage());
+        return ApiError.builder()
+                .status(HttpStatus.BAD_REQUEST)
+                .reason("Incorrectly made request.")
+                .message(e.getMessage())
+                .errors(List.of(e.getClass().getName()))
+                .timestamp(LocalDateTime.now()).build();
+    }
+
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.BAD_REQUEST)                                                                     // 400
+    public ApiError handleWrongEventDateError(final WrongEventDateException e) {
+        log.info("400 {}", e.getMessage());
+        return ApiError.builder()
+                .status(HttpStatus.BAD_REQUEST)
+                .reason("Field: eventDate. Error: должно содержать дату, которая наступит не ранее чем через 2 часа")
+                .message(e.getMessage())
+                .errors(List.of(e.getClass().getName()))
+                .timestamp(LocalDateTime.now()).build();
+    }
+
+    @ExceptionHandler
     @ResponseStatus(HttpStatus.NOT_FOUND)                                                                       // 404
     public ApiError handleNotFoundException(final NotFoundException e) {
         log.info("404 {}", e.getMessage());
         return ApiError.builder()
                 .status(HttpStatus.NOT_FOUND)
                 .reason("The required object was not found.")
+                .message(e.getMessage())
+                .errors(List.of(e.getClass().getName()))
+                .timestamp(LocalDateTime.now()).build();
+    }
+
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.CONFLICT)                                                                        // 409
+    public ApiError handleIllegalStatusError(final IllegalEventStatusException e) {
+        log.error("409 {}", e.getMessage());
+        return ApiError.builder()
+                .status(HttpStatus.CONFLICT)
+                .reason("Only pending or canceled events can be changed")
                 .message(e.getMessage())
                 .errors(List.of(e.getClass().getName()))
                 .timestamp(LocalDateTime.now()).build();

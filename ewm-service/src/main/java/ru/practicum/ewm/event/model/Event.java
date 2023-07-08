@@ -6,6 +6,9 @@ import ru.practicum.ewm.category.model.Category;
 import ru.practicum.ewm.user.model.User;
 
 import javax.persistence.*;
+import javax.validation.constraints.Future;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Size;
 import java.time.LocalDateTime;
 
 @Entity
@@ -22,6 +25,8 @@ public class Event {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Size(min = 20, max = 2000)
+    @NotBlank(message = "Имя пользователя не может быть пустым")
     private String annotation;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -36,6 +41,8 @@ public class Event {
     @Column(name = "created_on")
     private LocalDateTime createdOn;
 
+    @Size(min = 20, max = 7000)
+    @NotBlank(message = "Имя пользователя не может быть пустым")
     private String description;
 
     @Column(name = "event_date")
@@ -66,6 +73,8 @@ public class Event {
     @Enumerated(EnumType.STRING)
     private EventState state;
 
+    @Size(min = 3, max = 120)
+    @NotBlank(message = "Имя пользователя не может быть пустым")
     private String title;
 
     private Integer views;

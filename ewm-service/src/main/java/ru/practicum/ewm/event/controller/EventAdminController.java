@@ -15,7 +15,7 @@ public class EventAdminController {
 
     private final CategoryService categoryService;
 
-    @PostMapping
+    /*@PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public CategoryDto adminAddCategory(@RequestBody CategoryDto categoryDto) {
         return categoryService.addCategory(categoryDto);
@@ -31,6 +31,6 @@ public class EventAdminController {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void adminDeleteCategory(@PathVariable Long catId) {
         categoryService.deleteCategory(catId);
-    }
+    }*/
 
 }

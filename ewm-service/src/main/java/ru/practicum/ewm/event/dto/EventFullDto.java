@@ -9,6 +9,7 @@ import ru.practicum.ewm.event.model.Location;
 import ru.practicum.ewm.user.dto.UserShortDto;
 
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
 @Data
@@ -23,6 +24,7 @@ public class EventFullDto {
     @NotBlank(message = "Имя пользователя не может быть пустым")
     private String annotation;
 
+    @NotNull
     private CategoryDto category;
 
     private Integer confirmedRequests;
@@ -33,12 +35,16 @@ public class EventFullDto {
     @NotBlank(message = "Имя пользователя не может быть пустым")
     private String description;
 
+    @NotNull
     private String eventDate;
 
+    @NotNull
     private UserShortDto initiator;
 
+    @NotNull
     private Location location;
 
+    @NotNull
     private Boolean paid;
 
     private Integer participantLimit;

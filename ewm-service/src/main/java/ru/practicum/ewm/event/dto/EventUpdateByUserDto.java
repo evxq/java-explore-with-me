@@ -6,23 +6,16 @@ import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import ru.practicum.ewm.event.model.Location;
 
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.Size;
-
 @Data
 @Builder
 @AllArgsConstructor
 @RequiredArgsConstructor
-public class NewEventDto {
+public class EventUpdateByUserDto {
 
-    @Size(min = 20, max = 2000)
-    @NotBlank(message = "Имя пользователя не может быть пустым")
     private String annotation;
 
     private Long category_id;
 
-    @Size(min = 20, max = 7000)
-    @NotBlank(message = "Имя пользователя не может быть пустым")
     private String description;
 
     private String eventDate;
@@ -35,8 +28,8 @@ public class NewEventDto {
 
     private Boolean requestModeration;
 
-    @Size(min = 3, max = 120)
-    @NotBlank(message = "Имя пользователя не может быть пустым")
+    private String stateAction;
+
     private String title;
 
 }

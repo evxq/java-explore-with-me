@@ -1,9 +1,55 @@
 package ru.practicum.ewm.event;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 import ru.practicum.ewm.event.model.Event;
+import ru.practicum.ewm.event.model.EventState;
+
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface EventRepository extends JpaRepository<Event, Long> {
+
+    Optional<Event> findByIdAndStatus(Long eventId, EventState eventState);
+
+    Page<Event> findAllByInitiatorId(Long userId, Pageable pageable);
+
+    Page<Event> findAllByStateAndEventDateAfter(EventState eventState, LocalDateTime now, Pageable pageable);
+
+    Page<Event> findAllByCategoryIdInAndStateAndEventDateAfter(List<Integer> categories, EventState eventState,
+                                                               LocalDateTime now, Pageable pageable);
+
+    String QUERY_BY_PARAMETERS = "SELECT ev FROM events ev " +
+            "JOIN ev.category cat " +
+            "WHERE UPPER(ev.annotation) LIKE UPPER(CONCAT('%', ?1, '%')) OR UPPER(ev.description) LIKE UPPER(CONCAT('%', ?1, '%')) " +
+            "AND cat.id IN ?2 " +
+            "AND ev.paid = ?3 " +
+            "AND ev.eventDate BETWEEN ?4 and ?5 " +
+            "AND ev.state = PUBLISHED ";
+                                                        // НЕПРАВИЛЬНО ПОКА НЕ ЗАГРУЖЕНЫ ПРОСМОТРЫ !!!!!!
+    @Query(QUERY_BY_PARAMETERS +
+            "AND ev.confirmedRequests < ev.participantLimit " +
+            "ORDER BY ev.eventDate")
+    Page<Event> findAllAvailableByParamsSortByDate(String text, List<Integer> categories, Boolean paid,
+                                                   LocalDateTime rangeStart, LocalDateTime rangeEnd, Pageable pageable);
+
+    @Query(QUERY_BY_PARAMETERS +
+            "AND ev.confirmedRequests < ev.participantLimit " +
+            "ORDER BY ev.views")
+    Page<Event> findAllAvailableByParamsSortByViews(String text, List<Integer> categories, Boolean paid,
+                                                    LocalDateTime rangeStart, LocalDateTime rangeEnd, Pageable pageable);
+
+    @Query(QUERY_BY_PARAMETERS + "ORDER BY ev.eventDate")
+    Page<Event> findAllByParamsSortByDate(String text, List<Integer> categories, Boolean paid,
+                                          LocalDateTime rangeStart, LocalDateTime rangeEnd, Pageable pageable);
+
+    @Query(QUERY_BY_PARAMETERS + "ORDER BY ev.views")
+    Page<Event> findAllByParamsSortByViews(String text, List<Integer> categories, Boolean paid,
+                                           LocalDateTime rangeStart, LocalDateTime rangeEnd, Pageable pageable);
+
 }

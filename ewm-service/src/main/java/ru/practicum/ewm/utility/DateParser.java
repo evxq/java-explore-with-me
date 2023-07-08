@@ -10,9 +10,4 @@ public class DateParser {
         return LocalDateTime.from(formatter.parse(date));
     }
 
-    /*public static String dateToString(LocalDateTime date) {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-        return LocalDateTime.from(formatter.parse(date));
-    }*/
-
 }
