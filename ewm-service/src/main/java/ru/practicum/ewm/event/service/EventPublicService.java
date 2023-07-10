@@ -6,7 +6,7 @@ import java.util.List;
 
 public interface EventPublicService {
 
-    List<EventFullDto> getRequiredPublicEvents(String text, List<Integer> categories, Boolean paid,
+    List<EventFullDto> getRequiredPublicEvents(String text, List<Long> categories, Boolean paid,
                                                String rangeStart, String rangeEnd, Boolean onlyAvailable,
                                                String sort, Integer from, Integer size);
 

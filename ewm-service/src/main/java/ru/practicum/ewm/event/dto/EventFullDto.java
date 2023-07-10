@@ -1,5 +1,6 @@
 package ru.practicum.ewm.event.dto;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -21,10 +22,11 @@ public class EventFullDto {
     private Long id;
 
     @Size(min = 20, max = 2000)
-    @NotBlank(message = "Имя пользователя не может быть пустым")
+    @NotBlank(message = "Аннотация не может быть пустой")
     private String annotation;
 
     @NotNull
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
     private CategoryDto category;
 
     private Integer confirmedRequests;
@@ -32,16 +34,18 @@ public class EventFullDto {
     private String createdOn;
 
     @Size(min = 20, max = 7000)
-    @NotBlank(message = "Имя пользователя не может быть пустым")
+    @NotBlank(message = "Описание не может быть пустым")
     private String description;
 
     @NotNull
     private String eventDate;
 
     @NotNull
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
     private UserShortDto initiator;
 
     @NotNull
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
     private Location location;
 
     @NotNull
@@ -56,7 +60,7 @@ public class EventFullDto {
     private String state;
 
     @Size(min = 3, max = 120)
-    @NotBlank(message = "Имя пользователя не может быть пустым")
+    @NotBlank(message = "Заголовок не может быть пустым")
     private String title;
 
     private Integer views;

@@ -26,7 +26,7 @@ public class Event {
     private Long id;
 
     @Size(min = 20, max = 2000)
-    @NotBlank(message = "Имя пользователя не может быть пустым")
+    @NotBlank(message = "Аннотация не может быть пустой")
     private String annotation;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -42,7 +42,7 @@ public class Event {
     private LocalDateTime createdOn;
 
     @Size(min = 20, max = 7000)
-    @NotBlank(message = "Имя пользователя не может быть пустым")
+    @NotBlank(message = "Описание не может быть пустым")
     private String description;
 
     @Column(name = "event_date")
@@ -74,7 +74,7 @@ public class Event {
     private EventState state;
 
     @Size(min = 3, max = 120)
-    @NotBlank(message = "Имя пользователя не может быть пустым")
+    @NotBlank(message = "Заголовок не может быть пустым")
     private String title;
 
     private Integer views;

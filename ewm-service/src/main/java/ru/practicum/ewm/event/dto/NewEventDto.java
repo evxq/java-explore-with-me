@@ -17,13 +17,13 @@ import javax.validation.constraints.Size;
 public class NewEventDto {
 
     @Size(min = 20, max = 2000)
-    @NotBlank(message = "Имя пользователя не может быть пустым")
+    @NotBlank(message = "Аннотация не может быть пустой")
     private String annotation;
 
-    private Long category_id;
+    private Long category;
 
     @Size(min = 20, max = 7000)
-    @NotBlank(message = "Имя пользователя не может быть пустым")
+    @NotBlank(message = "Описание не может быть пустым")
     private String description;
 
     private String eventDate;
@@ -38,7 +38,7 @@ public class NewEventDto {
     private Boolean requestModeration;
 
     @Size(min = 3, max = 120)
-    @NotBlank(message = "Имя пользователя не может быть пустым")
+    @NotBlank(message = "Заголовок не может быть пустым")
     private String title;
 
 }

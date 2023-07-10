@@ -1,10 +1,14 @@
 package ru.practicum.ewm.event.dto;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import ru.practicum.ewm.event.model.Location;
+
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Size;
 
 @Data
 @Builder
@@ -12,14 +16,17 @@ import ru.practicum.ewm.event.model.Location;
 @RequiredArgsConstructor
 public class EventUpdateByAdminDto {
 
+    @Size(min = 20, max = 2000)
     private String annotation;
 
-    private Long category_id;
+    private Long category;
 
+    @Size(min = 20, max = 7000)
     private String description;
 
     private String eventDate;
 
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
     private Location location;
 
     private Boolean paid;
@@ -30,6 +37,7 @@ public class EventUpdateByAdminDto {
 
     private String stateAction;         // админ может отправлять запрос на изменение события, с одним из двух статусов: PUBLISH_EVENT, REJECT_EVENT
 
+    @Size(min = 3, max = 120)
     private String title;
 
 }

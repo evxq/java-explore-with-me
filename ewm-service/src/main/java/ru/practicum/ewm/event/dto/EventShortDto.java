@@ -1,5 +1,6 @@
 package ru.practicum.ewm.event.dto;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -21,12 +22,14 @@ public class EventShortDto {
 
     private String annotation;
 
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
     private CategoryDto category;
 
     private Integer confirmedRequests;
 
     private String eventDate;
 
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
     private UserShortDto initiator;
 
     private Boolean paid;

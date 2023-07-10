@@ -7,6 +7,7 @@ import ru.practicum.ewm.event.dto.EventFullDto;
 import ru.practicum.ewm.event.dto.EventUpdateByAdminDto;
 import ru.practicum.ewm.event.service.EventAdminService;
 
+import javax.validation.Valid;
 import java.util.List;
 
 @Validated
@@ -19,14 +20,14 @@ public class EventAdminController {
 
     @PatchMapping("/{eventId}")
     public EventFullDto updateEventByAdmin(@PathVariable Long eventId,
-                                           @RequestBody EventUpdateByAdminDto eventUpdateByAdminDtoDto) {
+                                           @Valid @RequestBody EventUpdateByAdminDto eventUpdateByAdminDtoDto) {
         return eventAdminService.updateEventByAdmin(eventId, eventUpdateByAdminDtoDto);
     }
 
     @GetMapping
-    public List<EventFullDto> getRequiredAdminEvents(@RequestParam(required = false) List<Integer> users,
+    public List<EventFullDto> getRequiredAdminEvents(@RequestParam(required = false) List<Long> users,
                                                      @RequestParam(required = false) List<String> states,
-                                                     @RequestParam(required = false) List<Integer> categories,
+                                                     @RequestParam(required = false) List<Long> categories,
                                                      @RequestParam(required = false) String rangeStart,
                                                      @RequestParam(required = false) String rangeEnd,
                                                      @RequestParam(defaultValue = "0") Integer from,

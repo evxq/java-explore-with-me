@@ -10,6 +10,10 @@ import ru.practicum.ewm.utility.DateParser;
 public class EventMapper {
 
     public static EventFullDto toEventFullDto(Event event) {
+        String published = null;
+        if (event.getPublishedOn() != null) {
+            published =event.getPublishedOn().toString();
+        }
         return EventFullDto.builder()
                 .id(event.getId())
                 .annotation(event.getAnnotation())
@@ -17,12 +21,14 @@ public class EventMapper {
                 .confirmedRequests(event.getConfirmedRequests())
                 .createdOn(event.getCreatedOn().toString())
                 .description(event.getDescription())
-                .eventDate(event.getEventDate().toString())
+//                .eventDate(event.getEventDate().toString())
+                .eventDate(DateParser.dateToString(event.getEventDate()))
                 .initiator(UserMapper.toUserShortDto(event.getInitiator()))
                 .location(event.getLocation())
                 .paid(event.getPaid())
                 .participantLimit(event.getParticipantLimit())
-                .publishedOn(event.getPublishedOn().toString())
+//                .publishedOn(event.getPublishedOn().toString())
+                .publishedOn(published)
                 .requestModeration(event.getRequestModeration())
                 .state(event.getState().toString())
                 .title(event.getTitle())

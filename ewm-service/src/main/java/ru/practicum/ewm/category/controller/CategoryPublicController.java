@@ -8,7 +8,6 @@ import ru.practicum.ewm.category.service.CategoryService;
 
 import java.util.List;
 
-@Validated
 @RestController
 @RequiredArgsConstructor
 @RequestMapping(path = "/categories")

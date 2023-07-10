@@ -53,7 +53,7 @@ public class CategoryServiceImpl implements CategoryService {
         categoryRepository.findById(catId)
                 .orElseThrow(() -> {
                     log.warn("Category with id={} was not found", catId);
-                    return new NotFoundException(String.format("Category  with id=%d was not found", catId));
+                    throw new NotFoundException(String.format("Category  with id=%d was not found", catId));
                 });
         categoryRepository.deleteById(catId);
         log.info("Удалена категория id={}", catId);
@@ -72,7 +72,8 @@ public class CategoryServiceImpl implements CategoryService {
         Category category = categoryRepository.findById(catId)
                 .orElseThrow(() -> {
                     log.warn("Category with id={} was not found", catId);
-                    return new NotFoundException(String.format("Category with id=%d was not found", catId));
+//                    throw new NotFoundException(String.format("Category with id=%d was not found", catId));
+                    throw new NotFoundException("Category with id=%d was not found");
                 });
         log.info("Вызвана категория id={}", catId);
 
