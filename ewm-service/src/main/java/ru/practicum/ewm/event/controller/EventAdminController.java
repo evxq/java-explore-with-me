@@ -1,36 +1,37 @@
 package ru.practicum.ewm.event.controller;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import ru.practicum.ewm.category.dto.CategoryDto;
-import ru.practicum.ewm.category.service.CategoryService;
+import ru.practicum.ewm.event.dto.EventFullDto;
+import ru.practicum.ewm.event.dto.EventUpdateByAdminDto;
+import ru.practicum.ewm.event.service.EventAdminService;
+
+import java.util.List;
 
 @Validated
 @RestController
 @RequiredArgsConstructor
-@RequestMapping(path = "/admin/categories")
+@RequestMapping(path = "/admin/events")
 public class EventAdminController {
 
-    private final CategoryService categoryService;
+    private final EventAdminService eventAdminService;
 
-    /*@PostMapping
-    @ResponseStatus(HttpStatus.CREATED)
-    public CategoryDto adminAddCategory(@RequestBody CategoryDto categoryDto) {
-        return categoryService.addCategory(categoryDto);
+    @PatchMapping("/{eventId}")
+    public EventFullDto updateEventByAdmin(@PathVariable Long eventId,
+                                           @RequestBody EventUpdateByAdminDto eventUpdateByAdminDtoDto) {
+        return eventAdminService.updateEventByAdmin(eventId, eventUpdateByAdminDtoDto);
     }
 
-    @PatchMapping("/{catId}")
-    public CategoryDto adminUpdateCategory(@RequestBody CategoryDto categoryDto,
-                                           @PathVariable Long catId) {
-        return categoryService.updateCategory(categoryDto, catId);
+    @GetMapping
+    public List<EventFullDto> getRequiredAdminEvents(@RequestParam(required = false) List<Integer> users,
+                                                     @RequestParam(required = false) List<String> states,
+                                                     @RequestParam(required = false) List<Integer> categories,
+                                                     @RequestParam(required = false) String rangeStart,
+                                                     @RequestParam(required = false) String rangeEnd,
+                                                     @RequestParam(defaultValue = "0") Integer from,
+                                                     @RequestParam(defaultValue = "10") Integer size) {
+        return eventAdminService.getRequiredAdminEvents(users, states, categories, rangeStart, rangeEnd, from, size);
     }
-
-    @DeleteMapping("/{catId}")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void adminDeleteCategory(@PathVariable Long catId) {
-        categoryService.deleteCategory(catId);
-    }*/
 
 }

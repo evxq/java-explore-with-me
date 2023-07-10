@@ -15,13 +15,13 @@ public class EventPublicController {
     private final EventPublicService eventPublicService;
 
     @GetMapping
-    public List<EventFullDto> getRequiredPublicEvents(@RequestParam String text,
-                                                      @RequestParam List<Integer> categories,
-                                                      @RequestParam Boolean paid,
-                                                      @RequestParam String rangeStart,
-                                                      @RequestParam String rangeEnd,
-                                                      @RequestParam Boolean onlyAvailable,
-                                                      @RequestParam String sort,
+    public List<EventFullDto> getRequiredPublicEvents(@RequestParam(required = false) String text,
+                                                      @RequestParam(required = false) List<Integer> categories,
+                                                      @RequestParam(required = false) Boolean paid,
+                                                      @RequestParam(required = false) String rangeStart,
+                                                      @RequestParam(required = false) String rangeEnd,
+                                                      @RequestParam(required = false) Boolean onlyAvailable,
+                                                      @RequestParam(required = false) String sort,
                                                       @RequestParam(defaultValue = "0") Integer from,
                                                       @RequestParam(defaultValue = "10") Integer size) {
         return eventPublicService.getRequiredPublicEvents(text, categories, paid, rangeStart, rangeEnd, onlyAvailable, sort, from, size);

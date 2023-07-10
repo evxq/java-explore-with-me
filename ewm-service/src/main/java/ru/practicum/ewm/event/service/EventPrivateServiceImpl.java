@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.ewm.category.CategoryRepository;
+import ru.practicum.ewm.category.model.Category;
 import ru.practicum.ewm.event.EventMapper;
 import ru.practicum.ewm.event.EventRepository;
 import ru.practicum.ewm.event.dto.EventFullDto;
@@ -37,9 +38,13 @@ public class EventPrivateServiceImpl implements EventPrivateService {
     public EventFullDto createEvent(Long userId, NewEventDto newEventDto) {
         checkEventStartTime(newEventDto.getEventDate());
         Event event = EventMapper.toEvent(newEventDto);
+        event.setState(EventState.PENDING);
         event.setInitiator(userRepository.getReferenceById(userId));
         event.setCategory(categoryRepository.getReferenceById(newEventDto.getCategory_id()));
         event.setCreatedOn(LocalDateTime.now());
+        if (newEventDto.getParticipantLimit() == 0) {               // если лимита нет, то модерация не нужна?
+            event.setRequestModeration(false);
+        }
         Event newEvent = eventRepository.save(event);
         log.info("Создано событие id={}", newEvent.getId());
 
@@ -48,22 +53,55 @@ public class EventPrivateServiceImpl implements EventPrivateService {
 
     @Override
     public EventFullDto updateEventByUser(Long userId, Long eventId, EventUpdateByUserDto eventUpdateByUserDto) {
-        checkEventStartTime(eventUpdateByUserDto.getEventDate());
+        checkEventStartTime(eventUpdateByUserDto.getEventDate());       // дата и время на которые намечено событие не может быть раньше, чем через два часа от текущего момента
         Event existEvent = eventRepository.findById(eventId)
                 .orElseThrow(() -> {
                     log.warn("Event with id={} was not found", eventId);
                     throw new NotFoundException(String.format("Event with id=%d was not found", eventId));
                 });
-        if (existEvent.getState().equals(EventState.PUBLISHED)) {
+        if (eventUpdateByUserDto.getStateAction().equals("SEND_TO_REVIEW")) {
+            existEvent.setState(EventState.PENDING);
+        } else if (eventUpdateByUserDto.getStateAction().equals("CANCEL_REVIEW")) {
+            existEvent.setState(EventState.CANCELED);
+        } else {
+            log.warn("Некорректный статус запроса на изменение события {}", eventUpdateByUserDto.getStateAction());
+            throw new IllegalEventStatusException("Некорректный статус запроса на изменение события");
+        }
+        if (existEvent.getState().equals(EventState.PUBLISHED)) {       // изменить можно только отмененные события или события в состоянии ожидания модерации
             log.warn("Only pending or canceled events can be changed");
             throw new IllegalEventStatusException("Only pending or canceled events can be changed");
         }
+        if (eventUpdateByUserDto.getAnnotation() != null) {
+            existEvent.setAnnotation(eventUpdateByUserDto.getAnnotation());
+        }
+        if (!eventUpdateByUserDto.getCategory_id().equals(existEvent.getCategory().getId())) {
+            Category updCategory = categoryRepository.getReferenceById(eventUpdateByUserDto.getCategory_id());
+            existEvent.setCategory(updCategory);
+        }
+        if (eventUpdateByUserDto.getDescription() != null) {
+            existEvent.setDescription(eventUpdateByUserDto.getDescription());
+        }
+        existEvent.setEventDate(DateParser.parseDate(eventUpdateByUserDto.getEventDate()));
+        if (eventUpdateByUserDto.getLocation() != null) {
+            existEvent.setLocation(eventUpdateByUserDto.getLocation());
+        }
+        if (eventUpdateByUserDto.getPaid() != null) {
+            existEvent.setPaid(eventUpdateByUserDto.getPaid());
+        }
+        if (eventUpdateByUserDto.getParticipantLimit() != null || eventUpdateByUserDto.getParticipantLimit() > -1) {
+            existEvent.setParticipantLimit(eventUpdateByUserDto.getParticipantLimit());
+        }
+        if (eventUpdateByUserDto.getParticipantLimit() == 0) {              // если лимита нет, то модерация не нужна?
+            existEvent.setRequestModeration(false);
+        }
+        if (eventUpdateByUserDto.getTitle() != null) {
+            existEvent.setTitle(eventUpdateByUserDto.getTitle());
+        }
         Event updEvent = eventRepository.save(existEvent);
-        log.info("Обновлено событие id={}", eventId);
+        log.info("Событие id={} обновлено пользователем", eventId);
 
         return EventMapper.toEventFullDto(updEvent);
     }
-
 
     @Override
     public List<EventFullDto> getAllEventsByUser(Long userId, Integer from, Integer size) {

@@ -7,6 +7,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.client.RestTemplate;
 import ru.practicum.ewm.category.CategoryRepository;
 import ru.practicum.ewm.event.EventMapper;
 import ru.practicum.ewm.event.EventRepository;
@@ -85,7 +86,6 @@ public class EventPublicServiceImpl implements EventPublicService {
                 });
 
 //        ResponseEntity<Object> response = statClient.getStats(event.getPublishedOn().toString(), LocalDateTime.now().toString(), List.of("/events/" + eventId), false);
-//        List<StatsDto> list = (List<StatsDto>) response;
 
         return EventMapper.toEventFullDto(event);
     }

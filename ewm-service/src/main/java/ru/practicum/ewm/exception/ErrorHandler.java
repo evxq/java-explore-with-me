@@ -46,7 +46,7 @@ public class ErrorHandler {
     }
 
     @ExceptionHandler
-    @ResponseStatus(HttpStatus.BAD_REQUEST)                                                                     // 400
+    @ResponseStatus(HttpStatus.CONFLICT)                                                                     // 409
     public ApiError handleWrongEventDateError(final WrongEventDateException e) {
         log.info("400 {}", e.getMessage());
         return ApiError.builder()

@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import ru.practicum.ewm.event.model.Location;
 
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.PositiveOrZero;
 import javax.validation.constraints.Size;
 
 @Data
@@ -31,6 +32,7 @@ public class NewEventDto {
 
     private Boolean paid;
 
+    @PositiveOrZero
     private Integer participantLimit;
 
     private Boolean requestModeration;

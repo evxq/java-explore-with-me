@@ -31,7 +31,8 @@ public interface EventRepository extends JpaRepository<Event, Long> {
             "AND ev.paid = ?3 " +
             "AND ev.eventDate BETWEEN ?4 and ?5 " +
             "AND ev.state = PUBLISHED ";
-                                                        // НЕПРАВИЛЬНО ПОКА НЕ ЗАГРУЖЕНЫ ПРОСМОТРЫ !!!!!!
+
+    // НЕПРАВИЛЬНО ПОКА НЕ ЗАГРУЖЕНЫ ПРОСМОТРЫ !!!!!!
     @Query(QUERY_BY_PARAMETERS +
             "AND ev.confirmedRequests < ev.participantLimit " +
             "ORDER BY ev.eventDate")
@@ -51,5 +52,15 @@ public interface EventRepository extends JpaRepository<Event, Long> {
     @Query(QUERY_BY_PARAMETERS + "ORDER BY ev.views")
     Page<Event> findAllByParamsSortByViews(String text, List<Integer> categories, Boolean paid,
                                            LocalDateTime rangeStart, LocalDateTime rangeEnd, Pageable pageable);
+
+    @Query("SELECT ev FROM events ev " +
+            "JOIN ev.category cat " +
+            "JOIN ev.initiator init " +
+            "WHERE init.id IN ?1 " +
+            "AND ev.state IN ?2 " +
+            "AND cat.id IN ?3 " +
+            "AND ev.eventDate BETWEEN ?4 and ?5 ")
+    Page<Event> findAllByParametersForAdmin(List<Integer> users, List<EventState> stateList, List<Integer> categories,
+                                            LocalDateTime rangeStart, LocalDateTime rangeEnd, Pageable pageable);
 
 }

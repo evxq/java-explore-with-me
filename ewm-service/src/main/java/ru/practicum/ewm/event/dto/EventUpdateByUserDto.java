@@ -28,7 +28,7 @@ public class EventUpdateByUserDto {
 
     private Boolean requestModeration;
 
-    private String stateAction;
+    private String stateAction;         // пользователь может отправлять запрос на изменение события, с одним из двух статусов: SEND_TO_REVIEW, CANCEL_REVIEW
 
     private String title;
 
