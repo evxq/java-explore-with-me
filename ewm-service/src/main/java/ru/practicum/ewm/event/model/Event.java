@@ -6,7 +6,6 @@ import ru.practicum.ewm.category.model.Category;
 import ru.practicum.ewm.user.model.User;
 
 import javax.persistence.*;
-import javax.validation.constraints.Future;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
 import java.time.LocalDateTime;

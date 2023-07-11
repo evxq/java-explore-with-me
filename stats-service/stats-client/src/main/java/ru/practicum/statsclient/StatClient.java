@@ -8,6 +8,7 @@ import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.web.util.DefaultUriBuilderFactory;
 import ru.practicum.statsdto.dto.HitDto;
+import ru.practicum.statsdto.dto.StatsDto;
 
 import java.util.List;
 import java.util.Map;
@@ -26,11 +27,11 @@ public class StatClient extends BaseClient {
                 .build());
     }
 
-    public ResponseEntity<Object> addHit(HitDto hitDto) {
+    public ResponseEntity<HitDto> addHit(HitDto hitDto) {
         return post(API_HIT, hitDto);
     }
 
-    public ResponseEntity<Object> getStats(String start, String end, List<String> uris, Boolean unique) {
+    public ResponseEntity<StatsDto> getStats(String start, String end, List<String> uris, Boolean unique) {
         Map<String, Object> parameters = Map.of(
                 "start", start,
                 "end", end,

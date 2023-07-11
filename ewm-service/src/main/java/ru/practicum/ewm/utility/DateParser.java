@@ -10,7 +10,7 @@ public class DateParser {
         return LocalDateTime.from(formatter.parse(date));
     }
 
-    public static String dateToString(LocalDateTime date) {
+    public static String dateToString(LocalDateTime date) {             // ПЕРЕНЕСТИ В EVENT MAPPER
         return date.toString().replace("T", " ");
     }
 

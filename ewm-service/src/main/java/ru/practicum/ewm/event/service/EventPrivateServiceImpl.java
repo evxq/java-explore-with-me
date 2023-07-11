@@ -20,7 +20,7 @@ import ru.practicum.ewm.exception.NotFoundException;
 import ru.practicum.ewm.exception.WrongEventDateException;
 import ru.practicum.ewm.user.UserRepository;
 import ru.practicum.ewm.utility.DateParser;
-import ru.practicum.ewm.utility.PageDefinition;
+import ru.practicum.ewm.utility.PageQualifier;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -115,7 +115,7 @@ public class EventPrivateServiceImpl implements EventPrivateService {
         if (eventUpdateByUserDto.getParticipantLimit() != null && eventUpdateByUserDto.getParticipantLimit() > -1) {
             existEvent.setParticipantLimit(eventUpdateByUserDto.getParticipantLimit());
         }
-        if (eventUpdateByUserDto.getParticipantLimit() != null && eventUpdateByUserDto.getParticipantLimit() == 0) {              // если лимита нет, то модерация не нужна?
+        if (eventUpdateByUserDto.getParticipantLimit() != null && eventUpdateByUserDto.getParticipantLimit() == 0) {    // если лимита нет, то модерация не нужна?
             existEvent.setRequestModeration(false);
         }
         if (eventUpdateByUserDto.getTitle() != null) {
@@ -131,7 +131,7 @@ public class EventPrivateServiceImpl implements EventPrivateService {
     public List<EventFullDto> getAllEventsByUser(Long userId, Integer from, Integer size) {
         log.info("Вызван список событий, добавленных пользователем id={}", userId);
 
-        return eventRepository.findAllByInitiatorId(userId, PageDefinition.definePage(from, size))
+        return eventRepository.findAllByInitiatorId(userId, PageQualifier.definePage(from, size))
                 .stream().map(EventMapper::toEventFullDto).collect(Collectors.toList());
     }
 

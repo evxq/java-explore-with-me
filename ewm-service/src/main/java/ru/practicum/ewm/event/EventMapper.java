@@ -12,7 +12,7 @@ public class EventMapper {
     public static EventFullDto toEventFullDto(Event event) {
         String published = null;
         if (event.getPublishedOn() != null) {
-            published =event.getPublishedOn().toString();
+            published = event.getPublishedOn().toString();
         }
         return EventFullDto.builder()
                 .id(event.getId())

@@ -12,7 +12,7 @@ public interface EventPrivateService {
 
     EventFullDto updateEventByUser(Long userId, Long eventId, EventUpdateByUserDto eventUpdateByUserDto);
 
-    List<EventFullDto> getAllEventsByUser(Long userId, Integer from, Integer size);
+    List<EventFullDto> getAllEventsByUser(Long userId, Integer from, Integer size);             // ДОЛЖЕН БЫТЬ EVENT_SHORT_DTO
 
     EventFullDto getEventByUser(Long userId, Long eventId);
 

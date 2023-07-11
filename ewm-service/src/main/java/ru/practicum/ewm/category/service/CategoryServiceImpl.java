@@ -9,7 +9,7 @@ import ru.practicum.ewm.category.CategoryRepository;
 import ru.practicum.ewm.category.dto.CategoryDto;
 import ru.practicum.ewm.category.model.Category;
 import ru.practicum.ewm.exception.NotFoundException;
-import ru.practicum.ewm.utility.PageDefinition;
+import ru.practicum.ewm.utility.PageQualifier;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -63,7 +63,7 @@ public class CategoryServiceImpl implements CategoryService {
     public List<CategoryDto> getAllCategories(Integer from, Integer size) {
         log.info("Вызван список всех категорий");
 
-        return categoryRepository.findAll(PageDefinition.definePage(from, size))
+        return categoryRepository.findAll(PageQualifier.definePage(from, size))
                 .stream().map(CategoryMapper::toCategoryDto).collect(Collectors.toList());
     }
 

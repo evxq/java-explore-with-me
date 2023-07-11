@@ -12,9 +12,9 @@ import ru.practicum.ewm.event.dto.EventFullDto;
 import ru.practicum.ewm.event.model.Event;
 import ru.practicum.ewm.event.model.EventState;
 import ru.practicum.ewm.exception.NotFoundException;
-import ru.practicum.ewm.exception.WrongRequestException;
+import ru.practicum.ewm.exception.WrongEventParameterException;
 import ru.practicum.ewm.utility.DateParser;
-import ru.practicum.ewm.utility.PageDefinition;
+import ru.practicum.ewm.utility.PageQualifier;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -42,10 +42,10 @@ public class EventPublicServiceImpl implements EventPublicService {
             end = DateParser.parseDate(rangeEnd);
             if (start != null && start.isAfter(end)) {
                 log.warn("Дата rangeStart указана позже даты rangeEnd");
-                throw new WrongRequestException("Дата rangeStart не может быть позже даты rangeEnd");
+                throw new WrongEventParameterException("Дата rangeStart не может быть позже даты rangeEnd");
             }
         }
-        PageRequest page = PageDefinition.definePage(from, size);
+        PageRequest page = PageQualifier.definePage(from, size);
         Page<Event> eventList;
         if (text != null) {
             if (sort != null) {
@@ -70,7 +70,7 @@ public class EventPublicServiceImpl implements EventPublicService {
                         break;
                     default:
                         log.warn("Некорректный вариант сортировки");
-                        throw new WrongRequestException("Некорректный вариант сортировки");
+                        throw new WrongEventParameterException("Некорректный вариант сортировки");
                 }
             } else {        // text & categories & paid
                 eventList = eventRepository.findAllByParamsWithoutSort(text, categories, paid, LocalDateTime.now(), page);

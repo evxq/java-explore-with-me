@@ -33,7 +33,7 @@ public class ErrorHandler {
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.BAD_REQUEST)                                                                       // 400
-    public ApiError handleWrongRequestError(final WrongRequestException e) {
+    public ApiError handleWrongEventParameterError(final WrongEventParameterException e) {
         log.info("400 {}", e.getMessage());
         return ApiError.builder()
                 .status(HttpStatus.BAD_REQUEST)
@@ -71,6 +71,18 @@ public class ErrorHandler {
     @ExceptionHandler
     @ResponseStatus(HttpStatus.CONFLICT)                                                                          // 409
     public ApiError handleIllegalStatusError(final IllegalEventStatusException e) {
+        log.error("409 {}", e.getMessage());
+        return ApiError.builder()
+                .status(HttpStatus.CONFLICT)
+                .reason("Only pending or canceled events can be changed")
+                .message(e.getMessage())
+                .errors(List.of(e.getClass().getName()))
+                .timestamp(LocalDateTime.now()).build();
+    }
+
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.CONFLICT)                                                                          // 409
+    public ApiError handleWrongRequestParameterError(final WrongRequestParameterException e) {
         log.error("409 {}", e.getMessage());
         return ApiError.builder()
                 .status(HttpStatus.CONFLICT)

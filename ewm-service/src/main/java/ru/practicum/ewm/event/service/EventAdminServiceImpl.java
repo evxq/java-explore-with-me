@@ -20,7 +20,7 @@ import ru.practicum.ewm.exception.IllegalEventStatusException;
 import ru.practicum.ewm.exception.NotFoundException;
 import ru.practicum.ewm.exception.WrongEventDateException;
 import ru.practicum.ewm.utility.DateParser;
-import ru.practicum.ewm.utility.PageDefinition;
+import ru.practicum.ewm.utility.PageQualifier;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -113,7 +113,7 @@ public class EventAdminServiceImpl implements EventAdminService {
         List<EventState> stateList = states.stream().map(EventState::valueOf).collect(Collectors.toList());
         LocalDateTime start = DateParser.parseDate(rangeStart);
         LocalDateTime end = DateParser.parseDate(rangeEnd);
-        PageRequest page = PageDefinition.definePage(from, size);
+        PageRequest page = PageQualifier.definePage(from, size);
         Page<Event> eventPage;
         if (users != null) {
             eventPage = eventRepository.findAllByParametersForAdmin(users, stateList, categories, start, end, page);
