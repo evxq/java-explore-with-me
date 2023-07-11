@@ -11,6 +11,7 @@ import ru.practicum.ewm.event.model.EventState;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 @Repository
 public interface EventRepository extends JpaRepository<Event, Long> {
@@ -72,5 +73,7 @@ public interface EventRepository extends JpaRepository<Event, Long> {
             "AND ev.eventDate BETWEEN ?4 and ?5")
     Page<Event> findAllByParametersForAdmin(List<Long> users, List<EventState> stateList, List<Long> categories,
                                             LocalDateTime rangeStart, LocalDateTime rangeEnd, Pageable pageable);
+
+    Set<Event> findAllByIdIn(Set<Long> idSet);
 
 }

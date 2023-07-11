@@ -32,7 +32,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public List<UserDto> getRequiredUsers(List<Long> ids, Integer from, Integer size) {
-        List<UserDto> userList = new ArrayList<>();                                         // ПУСТОЙ СПИСОК ЕСЛИ НИЧЕГО НЕ НАЙДЕНО??
+        List<UserDto> userList = new ArrayList<>();
         if (ids == null && from != null && size != null) {
             userList = userRepository.findAll(PageQualifier.definePage(from, size))
                     .stream().map(UserMapper::toUserDto).collect(Collectors.toList());

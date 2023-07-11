@@ -40,11 +40,12 @@ public class RequestServiceImpl implements RequestService {
             log.warn("Параметр eventId равен null");
             throw new WrongParameterException("Параметр eventId равен null");
         }
-        Event event = eventRepository.findById(eventId)
+        Event event = checkEventForExist(eventId);
+        /*Event event = eventRepository.findById(eventId)
                 .orElseThrow(() -> {
                     log.warn("Event with id={} was not found", eventId);
                     throw new NotFoundException(String.format("Event with id=%d was not found", eventId));
-                });
+                });*/
         if (event.getInitiator().getId().equals(requesterId)) {
             log.warn("Пользователь id={} не может подать заявку на участие в своем событии id={}", requesterId, eventId);
             throw new WrongRequestParameterException(String.format("Пользователь id=%d не может подать заявку на участие в своем событии id=%d", requesterId, eventId));
@@ -119,11 +120,12 @@ public class RequestServiceImpl implements RequestService {
 
     @Override                      // получение информации о всех запросах на участие в событии, созданным пользователем
     public List<ParticipationRequestDto> getInputRequests(Long initiatorId, Long eventId) {
-        Event event = eventRepository.findById(eventId)
+        Event event = checkEventForExist(eventId);
+        /*Event event = eventRepository.findById(eventId)
                 .orElseThrow(() -> {
                     log.warn("Event with id={} was not found", eventId);
                     throw new NotFoundException(String.format("Event with id=%d was not found", eventId));
-                });
+                });*/
         if (!event.getInitiator().getId().equals(initiatorId)) {
             log.warn("Пользователь id={} не является инициатором события id={}", initiatorId, eventId);
             throw new WrongRequestParameterException(String.format("Пользователь id=%d не является инициатором события id=%d", initiatorId, eventId));
@@ -142,11 +144,12 @@ public class RequestServiceImpl implements RequestService {
         }
         List<ParticipationRequestDto> confirmedRequests = new ArrayList<>();
         List<ParticipationRequestDto> rejectedRequests = new ArrayList<>();
-        Event event = eventRepository.findById(eventId)
+        Event event = checkEventForExist(eventId);
+        /*Event event = eventRepository.findById(eventId)
                 .orElseThrow(() -> {
                     log.warn("Event with id={} was not found", eventId);
                     throw new NotFoundException(String.format("Event with id=%d was not found", eventId));
-                });
+                });*/
         if (!event.getInitiator().getId().equals(userId)) {
             log.warn("Пользователь id={} не является инициатором события id={}", userId, eventId);
             throw new WrongRequestParameterException(String.format("Пользователь id=%d не является инициатором события id=%d", userId, eventId));
@@ -202,6 +205,14 @@ public class RequestServiceImpl implements RequestService {
         return EventRequestStatusUpdateResult.builder()
                 .confirmedRequests(confirmedRequests)
                 .rejectedRequests(rejectedRequests).build();
+    }
+
+    private Event checkEventForExist(Long eventId) {
+        return eventRepository.findById(eventId)
+                .orElseThrow(() -> {
+                    log.warn("Event with id={} was not found", eventId);
+                    throw new NotFoundException(String.format("Event with id=%d was not found", eventId));
+                });
     }
 
 }

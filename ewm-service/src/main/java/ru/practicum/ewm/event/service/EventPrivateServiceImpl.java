@@ -72,11 +72,12 @@ public class EventPrivateServiceImpl implements EventPrivateService {
         if (eventUpdateByUserDto.getEventDate() != null) {
             checkEventStartTime(eventUpdateByUserDto.getEventDate());
         }
-        Event existEvent = eventRepository.findById(eventId)
+        Event existEvent = checkEventForExist(eventId);
+        /*Event existEvent = eventRepository.findById(eventId)
                 .orElseThrow(() -> {
                     log.warn("Event with id={} was not found", eventId);
                     throw new NotFoundException(String.format("Event with id=%d was not found", eventId));
-                });
+                });*/
         if (eventUpdateByUserDto.getStateAction() != null) {
             if (eventUpdateByUserDto.getStateAction().equals("SEND_TO_REVIEW")) {
                 existEvent.setState(EventState.PENDING);
@@ -137,11 +138,12 @@ public class EventPrivateServiceImpl implements EventPrivateService {
 
     @Override
     public EventFullDto getEventByUser(Long userId, Long eventId) {
-        Event event = eventRepository.findById(eventId)
+        Event event = checkEventForExist(eventId);
+        /*Event event = eventRepository.findById(eventId)
                 .orElseThrow(() -> {
                     log.warn("Event with id={} was not found", eventId);
                     throw new NotFoundException(String.format("Event with id=%d was not found", eventId));
-                });
+                });*/
         if (!event.getInitiator().getId().equals(userId)) {
             log.warn("");
             throw new NotFoundException(String.format("Пользователь id=%d не добавлял событие id=%d", userId, eventId));
@@ -157,6 +159,14 @@ public class EventPrivateServiceImpl implements EventPrivateService {
             log.warn("Начало события должно быть не ранее чем через 2 часа");
             throw new WrongEventDateException("Начало события должно быть не ранее чем через 2 часа");
         }
+    }
+
+    private Event checkEventForExist(Long eventId) {
+        return eventRepository.findById(eventId)
+                .orElseThrow(() -> {
+                    log.warn("Event with id={} was not found", eventId);
+                    throw new NotFoundException(String.format("Event with id=%d was not found", eventId));
+                });
     }
 
 }
