@@ -33,6 +33,7 @@ public interface EventRepository extends JpaRepository<Event, Long> {
             "AND ev.state = 'published' ";
 
     // НЕПРАВИЛЬНО ПОКА НЕ ЗАГРУЖЕНЫ ПРОСМОТРЫ !!!!!!
+
     @Query(QUERY_BY_PARAMETERS +
             "AND ev.confirmedRequests < ev.participantLimit " +
             "ORDER BY ev.eventDate")

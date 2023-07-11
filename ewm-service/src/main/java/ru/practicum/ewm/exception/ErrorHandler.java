@@ -33,7 +33,7 @@ public class ErrorHandler {
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.BAD_REQUEST)                                                                       // 400
-    public ApiError handleWrongEventParameterError(final WrongEventParameterException e) {
+    public ApiError handleWrongParameterError(final WrongParameterException e) {
         log.info("400 {}", e.getMessage());
         return ApiError.builder()
                 .status(HttpStatus.BAD_REQUEST)

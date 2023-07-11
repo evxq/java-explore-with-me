@@ -1,13 +1,14 @@
-package ru.practicum.ewm.request.model;
+package ru.practicum.ewm.request.dto;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
-import ru.practicum.ewm.request.dto.ParticipationRequestDto;
 
 import java.util.List;
 
 @Data
+@Builder
 @AllArgsConstructor
 @RequiredArgsConstructor
 public class EventRequestStatusUpdateResult {
