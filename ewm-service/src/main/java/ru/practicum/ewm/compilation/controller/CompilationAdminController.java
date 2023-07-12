@@ -5,6 +5,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.ewm.compilation.dto.CompilationDto;
+import ru.practicum.ewm.compilation.dto.NewCompilationDto;
 import ru.practicum.ewm.compilation.dto.UpdateCompilationRequest;
 import ru.practicum.ewm.compilation.service.CompilationService;
 
@@ -16,11 +17,11 @@ import javax.validation.Valid;
 @RequestMapping(path = "/admin/compilations")
 public class CompilationAdminController {
 
-    private CompilationService compilationService;
+    private final CompilationService compilationService;
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public CompilationDto createCompilation(@Valid @RequestBody UpdateCompilationRequest compilation) {
+    public CompilationDto createCompilation(@Valid @RequestBody NewCompilationDto compilation) {
         return compilationService.createCompilation(compilation);
     }
 

@@ -8,6 +8,7 @@ import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.ewm.compilation.CompilationMapper;
 import ru.practicum.ewm.compilation.CompilationRepository;
 import ru.practicum.ewm.compilation.dto.CompilationDto;
+import ru.practicum.ewm.compilation.dto.NewCompilationDto;
 import ru.practicum.ewm.compilation.dto.UpdateCompilationRequest;
 import ru.practicum.ewm.compilation.model.Compilation;
 import ru.practicum.ewm.event.model.Event;
@@ -29,8 +30,15 @@ public class CompilationServiceImpl implements CompilationService {
     private final EventRepository eventRepository;
 
     @Override
-    public CompilationDto createCompilation(UpdateCompilationRequest compilationToCreate) {
+    public CompilationDto createCompilation(NewCompilationDto compilationToCreate) {
         Compilation compilation = CompilationMapper.toCompilation(compilationToCreate);
+        if (compilationToCreate.getEvents() != null) {
+            Set<Event> newEventSet = eventRepository.findAllByIdIn(compilationToCreate.getEvents());
+            compilation.setEvents(newEventSet);
+        }
+        if (compilationToCreate.getPinned() == null) {
+            compilation.setPinned(false);
+        }
         Compilation newCompilation = compilationRepository.save(compilation);
         log.info("Создана подборка id={}", newCompilation.getId());
 
@@ -40,11 +48,6 @@ public class CompilationServiceImpl implements CompilationService {
     @Override
     public CompilationDto updateCompilation(Long compId, UpdateCompilationRequest compilationToUpdate) {
         Compilation compilation = checkCompilationForExist(compId);
-        /*Compilation compilation = compilationRepository.findById(compId)
-                .orElseThrow(() -> {
-                    log.warn("Compilation with id={} was not found", compId);
-                    throw new NotFoundException(String.format("Compilation with id=%d was not found", compId));
-                });*/
         if (compilationToUpdate.getEvents() != null) {
             Set<Event> newEventSet = eventRepository.findAllByIdIn(compilationToUpdate.getEvents());
             compilation.setEvents(newEventSet);

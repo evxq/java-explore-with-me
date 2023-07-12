@@ -13,7 +13,7 @@ import java.util.List;
 @RequestMapping(path = "/compilations")
 public class CompilationPublicController {
 
-    private CompilationService compilationService;
+    private final CompilationService compilationService;
 
     @GetMapping("/{compId}")
     public CompilationDto getCompilationById(@PathVariable Long compId) {

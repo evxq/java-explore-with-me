@@ -3,9 +3,9 @@ package ru.practicum.ewm.compilation.dto;
 import lombok.Builder;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
+import ru.practicum.ewm.event.dto.EventFullDto;
 
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.util.Set;
 
@@ -16,9 +16,8 @@ public class CompilationDto {
 
     private final Long id;
 
-    private final Set<Long> events;
+    private final Set<EventFullDto> events;
 
-    @NotNull
     private final Boolean pinned;
 
     @Size(max = 50)
