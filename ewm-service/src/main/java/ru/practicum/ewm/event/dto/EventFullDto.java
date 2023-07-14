@@ -63,6 +63,6 @@ public class EventFullDto {
     @NotBlank(message = "Заголовок не может быть пустым")
     private String title;
 
-    private Integer views;
+    private Long views;
 
 }

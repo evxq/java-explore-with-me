@@ -41,7 +41,7 @@ public class HitMapper {
 
     private static LocalDateTime parseDate(String date) {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-        return LocalDateTime.from(formatter.parse(date));
+        return LocalDateTime.from(formatter.parse(date.replace("T", " ").substring(0, 19)));
     }
 
 }

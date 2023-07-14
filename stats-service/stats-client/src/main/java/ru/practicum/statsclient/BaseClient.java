@@ -1,5 +1,7 @@
 package ru.practicum.statsclient;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.*;
 import org.springframework.lang.Nullable;
 import org.springframework.web.client.HttpClientErrorException;
@@ -8,6 +10,8 @@ import org.springframework.web.client.RestTemplate;
 import ru.practicum.statsdto.dto.HitDto;
 import ru.practicum.statsdto.dto.StatsDto;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -18,53 +22,54 @@ public class BaseClient {
         this.rest = rest;
     }
 
-    protected ResponseEntity<StatsDto> get(String path, @Nullable Map<String, Object> parameters) {
-        return makeStatAndSendRequest(HttpMethod.GET, path, null, parameters, null);
+    protected ResponseEntity<List<StatsDto>> get(String path, @Nullable Map<String, Object> parameters) {
+        return makeStatAndSendRequest(path, parameters);
     }
 
     protected <T> ResponseEntity<HitDto> post(String path, T body) {
-        return post(path, null, null, body);
+        return makeHitAndSendRequest(path, body);
     }
 
-    protected <T> ResponseEntity<HitDto> post(String path, Long userId, @Nullable Map<String, Object> parameters, T body) {
-        return makeHitAndSendRequest(HttpMethod.POST, path, userId, parameters, body);
+    private <T> ResponseEntity<HitDto> makeHitAndSendRequest(String path, T body) {
+        HttpEntity<T> requestEntity = new HttpEntity<>(body);
+        ResponseEntity<HitDto> statServerResponse;
+        try {
+            statServerResponse = rest.exchange(path, HttpMethod.POST, requestEntity, HitDto.class);
+        } catch (HttpStatusCodeException e) {
+//            return ResponseEntity.status(e.getStatusCode()).body(e.getResponseBodyAsByteArray());
+            throw new HttpClientErrorException(e.getStatusCode(), e.getStatusText());
+        }
+        return prepareGatewayResponseHit(statServerResponse);
     }
 
-    private <T> ResponseEntity<HitDto> makeHitAndSendRequest(HttpMethod method, String path, Long userId, @Nullable Map<String, Object> parameters, @Nullable T body) {
-        HttpEntity<T> requestEntity = new HttpEntity<>(body, defaultHeaders(userId));
+    private /*<T>*/ ResponseEntity<List<StatsDto>> makeStatAndSendRequest(String path, @Nullable Map<String, Object> parameters) {
+//        HttpEntity<T> requestEntity = new HttpEntity<>(null);
 
-        ResponseEntity<HitDto> shareitServerResponse;
+        ResponseEntity<List<StatsDto>> statServerResponse;
+//        ResponseEntity<StatsDto[]> statServerResponse;
+
+        TypeReference<List<StatsDto>> ref = new TypeReference<>() { };
         try {
             if (parameters != null) {
-                shareitServerResponse = rest.exchange(path, method, requestEntity, HitDto.class, parameters);
+                statServerResponse = rest.exchange(path, HttpMethod.GET, null, new ParameterizedTypeReference<>() {}, parameters);         /// СЮДА ПРИХОДИТ getStats
+//                statServerResponse = rest.getForEntity(path, StatsDto[].class, parameters);
+//                statServerResponse = rest.exchange(path, HttpMethod.GET, requestEntity, Object.class, parameters);         /// СЮДА ПРИХОДИТ getStats
             } else {
-                shareitServerResponse = rest.exchange(path, method, requestEntity, HitDto.class);
+                statServerResponse = rest.exchange(path, HttpMethod.GET, null, new ParameterizedTypeReference<>() {});
+//                statServerResponse = rest.exchange(path, HttpMethod.GET, requestEntity, StatsDto.class);
+//                statServerResponse = rest.getForEntity(path, StatsDto[].class);
             }
         } catch (HttpStatusCodeException e) {
 //            return ResponseEntity.status(e.getStatusCode()).body(e.getResponseBodyAsByteArray());
             throw new HttpClientErrorException(e.getStatusCode(), e.getStatusText());
         }
-        return prepareGatewayResponseHit(shareitServerResponse);
+//        List<StatsDto> list = new ArrayList<>(Arrays.asList(statServerResponse.getBody()));
+
+//        return prepareGatewayResponseStat(statServerResponse);
+        return statServerResponse;
     }
 
-    private <T> ResponseEntity<StatsDto> makeStatAndSendRequest(HttpMethod method, String path, Long userId, @Nullable Map<String, Object> parameters, @Nullable T body) {
-        HttpEntity<T> requestEntity = new HttpEntity<>(body, defaultHeaders(userId));
-
-        ResponseEntity<StatsDto> shareitServerResponse;
-        try {
-            if (parameters != null) {
-                shareitServerResponse = rest.exchange(path, method, requestEntity, StatsDto.class, parameters);
-            } else {
-                shareitServerResponse = rest.exchange(path, method, requestEntity, StatsDto.class);
-            }
-        } catch (HttpStatusCodeException e) {
-//            return ResponseEntity.status(e.getStatusCode()).body(e.getResponseBodyAsByteArray());
-            throw new HttpClientErrorException(e.getStatusCode(), e.getStatusText());
-        }
-        return prepareGatewayResponseStat(shareitServerResponse);
-    }
-
-    private HttpHeaders defaultHeaders(Long userId) {
+    /*private HttpHeaders defaultHeaders(Long userId) {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         headers.setAccept(List.of(MediaType.APPLICATION_JSON));
@@ -72,10 +77,11 @@ public class BaseClient {
             headers.set("X-Sharer-User-Id", String.valueOf(userId));
         }
         return headers;
-    }
+    }*/
 
-    private static ResponseEntity<StatsDto> prepareGatewayResponseStat(ResponseEntity<StatsDto> response) {
+    /*private static ResponseEntity<List<StatsDto>> prepareGatewayResponseStat(ResponseEntity<StatsDto[]> response) {
         if (response.getStatusCode().is2xxSuccessful()) {
+//            List<StatsDto> list = new ArrayList<>(Arrays.asList(response.getBody()));
             return response;
         }
 
@@ -86,19 +92,16 @@ public class BaseClient {
         }
 
         return responseBuilder.build();
-    }
+    }*/
 
-    private static ResponseEntity<HitDto> prepareGatewayResponseHit(ResponseEntity<HitDto> response) {
+    private static <T> ResponseEntity<T> prepareGatewayResponseHit(ResponseEntity<T> response) {
         if (response.getStatusCode().is2xxSuccessful()) {
             return response;
         }
-
         ResponseEntity.BodyBuilder responseBuilder = ResponseEntity.status(response.getStatusCode());
-
         if (response.hasBody()) {
             return responseBuilder.body(response.getBody());
         }
-
         return responseBuilder.build();
     }
 

@@ -15,28 +15,28 @@ public interface HitRepository extends JpaRepository<Hit, Long> {
     @Query("SELECT new ru.practicum.explore.model.Stats(hit.app, hit.uri, COUNT(DISTINCT hit.ip)) " +
             "FROM Hit hit " +
             "WHERE hit.datetime BETWEEN ?1 AND ?2 " +
-            "GROUP BY hit.ip")
+            "GROUP BY hit.app, hit.uri")
     List<Stats> findStatsByDistinctIp(LocalDateTime from, LocalDateTime to);
 
     @Query("SELECT new ru.practicum.explore.model.Stats(hit.app, hit.uri, COUNT(DISTINCT hit.ip)) " +
             "FROM Hit hit " +
             "WHERE hit.datetime BETWEEN ?1 AND ?2 " +
             "AND hit.uri IN ?3 " +
-            "GROUP BY hit.ip")
-    List<Stats> findStatsByUriDistinctIp(LocalDateTime from, LocalDateTime to, List<String> uris);                      // ТЕСТ 2.2
-
-    @Query("SELECT new ru.practicum.explore.model.Stats(hit.app, hit.uri" + ", COUNT(hit.id)) " +
-            "FROM Hit hit " +
-            "WHERE hit.datetime BETWEEN ?1 AND ?2 " +
-            "GROUP BY hit.uri")
-    List<Stats> findStatsByDatetimeBetween(LocalDateTime from, LocalDateTime to);                                       // ТЕСТ 1.2
+            "GROUP BY hit.app, hit.uri")
+    List<Stats> findStatsByUriDistinctIp(LocalDateTime from, LocalDateTime to, List<String> uris);                      // ТЕСТ 2.2  ЗАПРОС НА КОТОРОМ ВСЕ ОТЛАЖИВАЛОСЬ
 
     @Query("SELECT new ru.practicum.explore.model.Stats(hit.app, hit.uri, COUNT(hit.id)) " +
             "FROM Hit hit " +
             "WHERE hit.datetime BETWEEN ?1 AND ?2 " +
+            "GROUP BY hit.app, hit.uri")
+    List<Stats> findStatsByDatetimeBetween(LocalDateTime from, LocalDateTime to);                                       // ТЕСТ 1.2
+
+    @Query("SELECT new ru.practicum.explore.model.Stats(hit.app, hit.uri, COUNT(hit.ip)) " +
+            "FROM Hit hit " +
+            "WHERE hit.datetime BETWEEN ?1 AND ?2 " +
             "AND hit.uri IN ?3 " +
-            "GROUP BY hit.uri " +
-            "ORDER BY COUNT(hit.id) DESC")
-    List<Stats> findStatsByDatetimeBetweenAndUriIn(LocalDateTime from, LocalDateTime to, List<String> uris);            // ТЕСТ 1.1 / 2.1 / 3.1 / 3.2
+            "GROUP BY hit.uri, hit.app " +
+            "ORDER BY COUNT(hit.ip) DESC")
+    List<Stats> findStatsByDatetimeBetweenAndUriIn(LocalDateTime from, LocalDateTime to, List<String> uris);            // ТЕСТ 1.1 / 2.1 / 3.1 / 3.2   // ТЕСТ СТАТ 2
 
 }
