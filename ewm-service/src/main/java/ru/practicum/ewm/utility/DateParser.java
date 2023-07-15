@@ -4,14 +4,8 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
 public class DateParser {
-
     public static LocalDateTime parseDate(String date) {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
         return LocalDateTime.from(formatter.parse(date));
     }
-
-    public static String dateToString(LocalDateTime date) {             // ПЕРЕНЕСТИ В EVENT MAPPER
-        return date.toString().replace("T", " ");
-    }
-
 }

@@ -2,25 +2,23 @@ package ru.practicum.ewm.event.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.ewm.category.CategoryRepository;
 import ru.practicum.ewm.category.model.Category;
 import ru.practicum.ewm.event.EventMapper;
-import ru.practicum.ewm.event.model.Location;
-import ru.practicum.ewm.event.repository.EventRepository;
 import ru.practicum.ewm.event.dto.EventFullDto;
 import ru.practicum.ewm.event.dto.EventUpdateByAdminDto;
 import ru.practicum.ewm.event.model.Event;
 import ru.practicum.ewm.event.model.EventState;
+import ru.practicum.ewm.event.model.Location;
+import ru.practicum.ewm.event.repository.EventCustomRepository;
+import ru.practicum.ewm.event.repository.EventRepository;
 import ru.practicum.ewm.event.repository.LocationRepository;
 import ru.practicum.ewm.exception.IllegalEventStatusException;
 import ru.practicum.ewm.exception.NotFoundException;
 import ru.practicum.ewm.exception.WrongEventDateException;
 import ru.practicum.ewm.utility.DateParser;
-import ru.practicum.ewm.utility.PageQualifier;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -33,10 +31,10 @@ import java.util.stream.Collectors;
 public class EventAdminServiceImpl implements EventAdminService {
 
     private final EventRepository eventRepository;
+    private final EventCustomRepository eventCustomRepository;
     private final CategoryRepository categoryRepository;
     private final LocationRepository locationRepository;
 
-    // админ может отправлять запрос на изменение события, с одним из двух статусов: PUBLISH_EVENT, REJECT_EVENT
     @Override
     public EventFullDto updateEventByAdmin(Long eventId, EventUpdateByAdminDto eventUpdateByAdminDto) {
         Event existEvent = eventRepository.findById(eventId)
@@ -51,11 +49,6 @@ public class EventAdminServiceImpl implements EventAdminService {
         if (eventUpdateByAdminDto.getStateAction() != null) {
             if (eventUpdateByAdminDto.getStateAction().equals("PUBLISH_EVENT")) {
                 if (existEvent.getState().equals(EventState.PENDING)) {
-                    /*if (eventUpdateByAdminDto.getEventDate() != null) {
-                        checkEventStartTime(eventUpdateByAdminDto.getEventDate());
-                        existEvent.setEventDate(DateParser.parseDate(eventUpdateByAdminDto.getEventDate()));
-                    }*/
-//                    checkEventStartTime(DateParser.dateToString(existEvent.getEventDate()));
                     existEvent.setState(EventState.PUBLISHED);
                     existEvent.setPublishedOn(LocalDateTime.now());
                 } else {
@@ -108,21 +101,25 @@ public class EventAdminServiceImpl implements EventAdminService {
     }
 
     @Override
-    public List<EventFullDto> getRequiredAdminEvents(List<Long> users, List<String> states, List<Long> categories,
-                                                     String rangeStart, String rangeEnd, Integer from, Integer size) {
-        List<EventState> stateList = states.stream().map(EventState::valueOf).collect(Collectors.toList());
-        LocalDateTime start = DateParser.parseDate(rangeStart);
-        LocalDateTime end = DateParser.parseDate(rangeEnd);
-        PageRequest page = PageQualifier.definePage(from, size);
-        Page<Event> eventPage;
-        if (users != null) {
-            eventPage = eventRepository.findAllByParametersForAdmin(users, stateList, categories, start, end, page);
-            log.info("Администратор запросил список всех событий по параметрам");
-        } else {
-            eventPage = eventRepository.findAll(page);
-            log.info("Администратор запросил список всех событий");
+    public List<EventFullDto> getRequiredAdminEvents(List<Long> users, List<String> states,
+                                                     List<Long> categories, String rangeStart,
+                                                     String rangeEnd, Integer from, Integer size) {
+        List<EventState> stateList = null;
+        LocalDateTime start = null;
+        LocalDateTime end = null;
+        if (states != null) {
+            stateList = states.stream().map(EventState::valueOf).collect(Collectors.toList());
         }
-        return eventPage.stream().map(EventMapper::toEventFullDto).collect(Collectors.toList());
+        if (rangeStart != null) {
+            start = DateParser.parseDate(rangeStart);
+        }
+        if (rangeEnd != null) {
+            end = DateParser.parseDate(rangeEnd);
+        }
+        List<Event> eventList = eventCustomRepository.getEventsByAdmin(users, stateList, categories, start, end, from, size);
+        log.info("Администратор вызвал список событий по параметрам");
+
+        return eventList.stream().map(EventMapper::toEventFullDto).collect(Collectors.toList());
     }
 
     private void checkEventStartTime(String eventDate) {

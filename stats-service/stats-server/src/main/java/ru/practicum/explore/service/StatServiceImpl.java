@@ -45,30 +45,6 @@ public class StatServiceImpl implements StatService {
             throw new WrongParameterException("Дата начала диапазона не может быть позже даты конца диапазона");
         }
         List<String> urisList = checkUriFormat(uris);
-        /*List<String> urisList = new ArrayList<>();
-        if (!uris.isEmpty() && uris.get(0).contains("[")) {
-            if (uris.size() == 1) {
-                String cut = uris.get(0).substring(1, uris.get(0).length() - 1);
-                urisList.add(cut);
-            } else if (uris.size() == 2) {
-                String first = uris.get(0).substring(1);
-                String last = uris.get(uris.size() - 1);
-                String lastCut = last.substring(0, last.length() - 1);
-                urisList.add(first);
-                urisList.add(lastCut);
-            } else {
-                String first = uris.get(0).substring(1);
-                String last = uris.get(uris.size() - 1);
-                String lastCut = last.substring(0, last.length() - 1);
-                for (int i = 1; i < uris.size() - 2; i++) {
-                    urisList.add(uris.get(i));
-                }
-                urisList.add(0, first);
-                urisList.add(lastCut);
-            }
-        } else {
-            urisList = uris;
-        }*/
         List<Stats> statList = new ArrayList<>();
         if (urisList.isEmpty() && !unique) {
             statList = hitRepository.findStatsByDatetimeBetween(startDate, endDate);                    // только начало и конец, unique=false

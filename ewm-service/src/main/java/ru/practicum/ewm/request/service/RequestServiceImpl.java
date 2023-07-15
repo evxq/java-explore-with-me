@@ -41,37 +41,42 @@ public class RequestServiceImpl implements RequestService {
             throw new WrongParameterException("Параметр eventId равен null");
         }
         Event event = checkEventForExist(eventId);
-        /*Event event = eventRepository.findById(eventId)
-                .orElseThrow(() -> {
-                    log.warn("Event with id={} was not found", eventId);
-                    throw new NotFoundException(String.format("Event with id=%d was not found", eventId));
-                });*/
+
         if (event.getInitiator().getId().equals(requesterId)) {
             log.warn("Пользователь id={} не может подать заявку на участие в своем событии id={}", requesterId, eventId);
-            throw new WrongRequestParameterException(String.format("Пользователь id=%d не может подать заявку на участие в своем событии id=%d", requesterId, eventId));
+            throw new WrongRequestParameterException(
+                    String.format("Пользователь id=%d не может подать заявку на участие в своем событии id=%d", requesterId, eventId));
         }
         if (!event.getState().equals(EventState.PUBLISHED)) {
             log.warn("Нельзя участвовать в неопубликованном событии id={}", eventId);
-            throw new WrongRequestParameterException(String.format("Нельзя участвовать в неопубликованном событии id=%d", eventId));
+            throw new WrongRequestParameterException(
+                    String.format("Нельзя участвовать в неопубликованном событии id=%d", eventId));
         }
         if (event.getParticipantLimit() != 0 && event.getParticipantLimit().equals(event.getConfirmedRequests())) {
-            // ПОСЛЕ ПРЕВЫШЕНИЯ ЛИМИТА ДОЛЖЕН ВОЗВРАЩАТЬ REJECTED????
             Request rejectedRequest = Request.builder()
                     .created(LocalDateTime.now().withNano(0))
                     .event(event)
                     .requester(userRepository.getReferenceById(requesterId))
                     .status(RequestStatus.REJECTED).build();
             requestRepository.save(rejectedRequest);
-
             log.warn("Достигнут лимит запросов на участие в событии id={}", eventId);
-            throw new WrongRequestParameterException(String.format("Достигнут лимит запросов на участие в событии id=%d", eventId));
+            throw new WrongRequestParameterException(
+                    String.format("Достигнут лимит запросов на участие в событии id=%d", eventId));
+        }
+        if (event.getParticipantLimit() != 0 && event.getConfirmedRequests()
+                + requestRepository.findByEventAndStatus(event, RequestStatus.PENDING) >= event.getParticipantLimit()) {
+            log.warn("Достигнут лимит запросов на участие в событии id={}", eventId);
+            throw new WrongRequestParameterException(
+                    String.format("Достигнут лимит запросов на участие в событии id=%d", eventId));
         }
         if (requestRepository.findByEventIdAndRequesterId(eventId, requesterId) != null) {
             log.warn("Пользователь id={} не может добавить повторный запрос на участие в событии id={}", requesterId, eventId);
-            throw new WrongRequestParameterException(String.format("Пользователь id=%d не может добавить повторный запрос на участие в событии id=%d", requesterId, eventId));
+            throw new WrongRequestParameterException(
+                    String.format("Пользователь id=%d не может добавить повторный запрос на участие в событии id=%d", requesterId, eventId));
         }
-        int numOfParticipants = event.getConfirmedRequests();
-        event.setConfirmedRequests(numOfParticipants + 1);
+//        int numOfParticipants = event.getConfirmedRequests();
+//        event.setConfirmedRequests(numOfParticipants + 1);                                  // ЗАЧЕМ В ЗАЯВКЕ ПОДТВЕРЖДАТЬ УЧАСТНИКА????
+        //
         Request request = Request.builder()
                 .created(LocalDateTime.now().withNano(0))
                 .event(event)
@@ -79,6 +84,8 @@ public class RequestServiceImpl implements RequestService {
                 .status(RequestStatus.PENDING).build();
         if (event.getParticipantLimit() == 0) {
             request.setStatus(RequestStatus.CONFIRMED);
+            int numOfParticipants = event.getConfirmedRequests();
+            event.setConfirmedRequests(numOfParticipants + 1);                              // ПОДТВЕРЖДАТЬ УЧАСТНИКА НУЖНО ТОЛЬКО ЕСЛИ ParticipantLimit == 0
         }
         eventRepository.save(event);
         Request newRequest = requestRepository.save(request);
@@ -121,11 +128,7 @@ public class RequestServiceImpl implements RequestService {
     @Override                      // получение информации о всех запросах на участие в событии, созданным пользователем
     public List<ParticipationRequestDto> getInputRequests(Long initiatorId, Long eventId) {
         Event event = checkEventForExist(eventId);
-        /*Event event = eventRepository.findById(eventId)
-                .orElseThrow(() -> {
-                    log.warn("Event with id={} was not found", eventId);
-                    throw new NotFoundException(String.format("Event with id=%d was not found", eventId));
-                });*/
+
         if (!event.getInitiator().getId().equals(initiatorId)) {
             log.warn("Пользователь id={} не является инициатором события id={}", initiatorId, eventId);
             throw new WrongRequestParameterException(String.format("Пользователь id=%d не является инициатором события id=%d", initiatorId, eventId));
@@ -145,11 +148,7 @@ public class RequestServiceImpl implements RequestService {
         List<ParticipationRequestDto> confirmedRequests = new ArrayList<>();
         List<ParticipationRequestDto> rejectedRequests = new ArrayList<>();
         Event event = checkEventForExist(eventId);
-        /*Event event = eventRepository.findById(eventId)
-                .orElseThrow(() -> {
-                    log.warn("Event with id={} was not found", eventId);
-                    throw new NotFoundException(String.format("Event with id=%d was not found", eventId));
-                });*/
+
         if (!event.getInitiator().getId().equals(userId)) {
             log.warn("Пользователь id={} не является инициатором события id={}", userId, eventId);
             throw new WrongRequestParameterException(String.format("Пользователь id=%d не является инициатором события id=%d", userId, eventId));
@@ -171,7 +170,8 @@ public class RequestServiceImpl implements RequestService {
                     }
                 } else {
                     log.warn("Заявка id={} не находится в состоянии ожидания", request.getId());
-                    throw new WrongRequestParameterException(String.format("Заявка id=%d не находится в состоянии ожидания", request.getId()));
+                    throw new WrongRequestParameterException(
+                            String.format("Заявка id=%d не находится в состоянии ожидания", request.getId()));
                 }
             }
         } else {
@@ -185,7 +185,8 @@ public class RequestServiceImpl implements RequestService {
                             event.setConfirmedRequests(event.getConfirmedRequests() + 1);
                         } else {
                             log.warn("Для события id={} превышен лимит заявок", eventId);
-                            throw new WrongRequestParameterException(String.format("Для события id=%d превышен лимит заявок", eventId));
+                            throw new WrongRequestParameterException(
+                                    String.format("Для события id=%d превышен лимит заявок", eventId));
                         }
                     } else {
                         request.setStatus(requestStatus);
@@ -194,7 +195,8 @@ public class RequestServiceImpl implements RequestService {
                     }
                 } else {
                     log.warn("Заявка id={} не находится в состоянии ожидания", request.getId());
-                    throw new WrongRequestParameterException(String.format("Заявка id=%d не находится в состоянии ожидания", request.getId()));
+                    throw new WrongRequestParameterException(
+                            String.format("Заявка id=%d не находится в состоянии ожидания", request.getId()));
                 }
             }
 

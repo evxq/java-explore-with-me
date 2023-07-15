@@ -34,7 +34,7 @@ public class EventUpdateByUserDto {
 
     private Boolean requestModeration;
 
-    private String stateAction;         // пользователь может отправлять запрос на изменение события, с одним из двух статусов: SEND_TO_REVIEW, CANCEL_REVIEW
+    private String stateAction;
 
     @Size(min = 3, max = 120)
     private String title;

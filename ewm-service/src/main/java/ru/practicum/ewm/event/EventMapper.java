@@ -7,6 +7,8 @@ import ru.practicum.ewm.event.model.Event;
 import ru.practicum.ewm.user.UserMapper;
 import ru.practicum.ewm.utility.DateParser;
 
+import java.time.LocalDateTime;
+
 public class EventMapper {
 
     public static EventFullDto toEventFullDto(Event event) {
@@ -21,13 +23,11 @@ public class EventMapper {
                 .confirmedRequests(event.getConfirmedRequests())
                 .createdOn(event.getCreatedOn().toString())
                 .description(event.getDescription())
-//                .eventDate(event.getEventDate().toString())
-                .eventDate(DateParser.dateToString(event.getEventDate()))
+                .eventDate(dateToString(event.getEventDate()))
                 .initiator(UserMapper.toUserShortDto(event.getInitiator()))
                 .location(event.getLocation())
                 .paid(event.getPaid())
                 .participantLimit(event.getParticipantLimit())
-//                .publishedOn(event.getPublishedOn().toString())
                 .publishedOn(published)
                 .requestModeration(event.getRequestModeration())
                 .state(event.getState().toString())
@@ -47,6 +47,10 @@ public class EventMapper {
                 .requestModeration(newEventDto.getRequestModeration())
                 .title(newEventDto.getTitle())
                 .build();
+    }
+
+    public static String dateToString(LocalDateTime date) {
+        return date.toString().replace("T", " ");
     }
 
 }

@@ -7,7 +7,6 @@ import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import ru.practicum.ewm.event.model.Location;
 
-import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
 
 @Data
@@ -35,7 +34,7 @@ public class EventUpdateByAdminDto {
 
     private Boolean requestModeration;
 
-    private String stateAction;         // админ может отправлять запрос на изменение события, с одним из двух статусов: PUBLISH_EVENT, REJECT_EVENT
+    private String stateAction;
 
     @Size(min = 3, max = 120)
     private String title;

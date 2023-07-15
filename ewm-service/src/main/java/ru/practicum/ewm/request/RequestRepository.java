@@ -2,7 +2,9 @@ package ru.practicum.ewm.request;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import ru.practicum.ewm.event.model.Event;
 import ru.practicum.ewm.request.model.Request;
+import ru.practicum.ewm.request.model.RequestStatus;
 
 import java.util.List;
 
@@ -17,6 +19,11 @@ public interface RequestRepository extends JpaRepository<Request, Long> {
             "WHERE ev.id = ?1")
     List<Request> findRequestsByInitiator(Long eventId);
 
-    List<Request> findByIdIn( List<Long> idList);
+    @Query("SELECT COUNT(req) FROM Request req " +
+            "WHERE req.event = ?1 " +
+            "AND req.status = ?2")
+    Long findByEventAndStatus(Event event, RequestStatus status);
+
+    List<Request> findByIdIn(List<Long> idList);
 
 }

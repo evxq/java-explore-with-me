@@ -47,7 +47,7 @@ public class RequestController {
     public EventRequestStatusUpdateResult responseToRequests(@PathVariable Long userId,
                                                              @PathVariable Long eventId,
                                                              @RequestBody(required = false)
-                                                                         EventRequestStatusUpdateRequest requestList) {
+                                                                     EventRequestStatusUpdateRequest requestList) {
         return requestService.responseToRequests(userId, eventId, requestList);
     }
 

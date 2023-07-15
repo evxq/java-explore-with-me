@@ -3,7 +3,6 @@ package ru.practicum.ewm.event.controller;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.ewm.event.dto.EventFullDto;
-import ru.practicum.ewm.event.service.EventParam;
 import ru.practicum.ewm.event.service.EventPublicService;
 
 import javax.servlet.http.HttpServletRequest;
@@ -27,9 +26,7 @@ public class EventPublicController {
                                                       @RequestParam(required = false) String sort,
                                                       @RequestParam(defaultValue = "0") Integer from,
                                                       @RequestParam(defaultValue = "10") Integer size) {
-//        EventParam eventParam = new EventParam(text, categories, paid, rangeStart, rangeEnd, onlyAvailable, sort);
         return eventPublicService.getRequiredPublicEvents(request, text, categories, paid, rangeStart, rangeEnd, onlyAvailable, sort, from, size);
-//        return eventPublicService.getRequiredPublicEvents(request, eventParam, from, size);
     }
 
     @GetMapping("/{eventId}")

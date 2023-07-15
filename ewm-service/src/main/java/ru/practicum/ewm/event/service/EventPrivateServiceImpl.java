@@ -7,13 +7,13 @@ import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.ewm.category.CategoryRepository;
 import ru.practicum.ewm.category.model.Category;
 import ru.practicum.ewm.event.EventMapper;
-import ru.practicum.ewm.event.model.Location;
-import ru.practicum.ewm.event.repository.EventRepository;
 import ru.practicum.ewm.event.dto.EventFullDto;
 import ru.practicum.ewm.event.dto.EventUpdateByUserDto;
 import ru.practicum.ewm.event.dto.NewEventDto;
 import ru.practicum.ewm.event.model.Event;
 import ru.practicum.ewm.event.model.EventState;
+import ru.practicum.ewm.event.model.Location;
+import ru.practicum.ewm.event.repository.EventRepository;
 import ru.practicum.ewm.event.repository.LocationRepository;
 import ru.practicum.ewm.exception.IllegalEventStatusException;
 import ru.practicum.ewm.exception.NotFoundException;
@@ -57,27 +57,19 @@ public class EventPrivateServiceImpl implements EventPrivateService {
         if (newEventDto.getParticipantLimit() == null) {
             event.setParticipantLimit(0);
         }
-        /*if (event.getParticipantLimit() == 0 || newEventDto.getParticipantLimit() == 0) {               // если лимита нет, то модерация не нужна?
-            event.setRequestModeration(false);
-        }*/
         Event newEvent = eventRepository.save(event);
         log.info("Создано событие id={}", newEvent.getId());
 
         return EventMapper.toEventFullDto(newEvent);
     }
 
-    // пользователь может отправлять запрос на изменение события, с одним из двух статусов: SEND_TO_REVIEW, CANCEL_REVIEW
     @Override
     public EventFullDto updateEventByUser(Long userId, Long eventId, EventUpdateByUserDto eventUpdateByUserDto) {
         if (eventUpdateByUserDto.getEventDate() != null) {
             checkEventStartTime(eventUpdateByUserDto.getEventDate());
         }
         Event existEvent = checkEventForExist(eventId);
-        /*Event existEvent = eventRepository.findById(eventId)
-                .orElseThrow(() -> {
-                    log.warn("Event with id={} was not found", eventId);
-                    throw new NotFoundException(String.format("Event with id=%d was not found", eventId));
-                });*/
+
         if (eventUpdateByUserDto.getStateAction() != null) {
             if (eventUpdateByUserDto.getStateAction().equals("SEND_TO_REVIEW")) {
                 existEvent.setState(EventState.PENDING);
@@ -116,7 +108,7 @@ public class EventPrivateServiceImpl implements EventPrivateService {
         if (eventUpdateByUserDto.getParticipantLimit() != null && eventUpdateByUserDto.getParticipantLimit() > -1) {
             existEvent.setParticipantLimit(eventUpdateByUserDto.getParticipantLimit());
         }
-        if (eventUpdateByUserDto.getParticipantLimit() != null && eventUpdateByUserDto.getParticipantLimit() == 0) {    // если лимита нет, то модерация не нужна?
+        if (eventUpdateByUserDto.getParticipantLimit() != null && eventUpdateByUserDto.getParticipantLimit() == 0) {
             existEvent.setRequestModeration(false);
         }
         if (eventUpdateByUserDto.getTitle() != null) {
@@ -139,11 +131,6 @@ public class EventPrivateServiceImpl implements EventPrivateService {
     @Override
     public EventFullDto getEventByUser(Long userId, Long eventId) {
         Event event = checkEventForExist(eventId);
-        /*Event event = eventRepository.findById(eventId)
-                .orElseThrow(() -> {
-                    log.warn("Event with id={} was not found", eventId);
-                    throw new NotFoundException(String.format("Event with id=%d was not found", eventId));
-                });*/
         if (!event.getInitiator().getId().equals(userId)) {
             log.warn("");
             throw new NotFoundException(String.format("Пользователь id=%d не добавлял событие id=%d", userId, eventId));
@@ -154,7 +141,6 @@ public class EventPrivateServiceImpl implements EventPrivateService {
     }
 
     private void checkEventStartTime(String eventDate) {
-        // дата и время на которые намечено событие не может быть раньше, чем через два часа от текущего момента
         if (DateParser.parseDate(eventDate).isBefore(LocalDateTime.now().plusHours(2))) {
             log.warn("Начало события должно быть не ранее чем через 2 часа");
             throw new WrongEventDateException("Начало события должно быть не ранее чем через 2 часа");
