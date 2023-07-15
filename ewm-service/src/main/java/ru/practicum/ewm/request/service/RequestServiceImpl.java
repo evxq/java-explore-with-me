@@ -74,9 +74,6 @@ public class RequestServiceImpl implements RequestService {
             throw new WrongRequestParameterException(
                     String.format("Пользователь id=%d не может добавить повторный запрос на участие в событии id=%d", requesterId, eventId));
         }
-//        int numOfParticipants = event.getConfirmedRequests();
-//        event.setConfirmedRequests(numOfParticipants + 1);                                  // ЗАЧЕМ В ЗАЯВКЕ ПОДТВЕРЖДАТЬ УЧАСТНИКА????
-        //
         Request request = Request.builder()
                 .created(LocalDateTime.now().withNano(0))
                 .event(event)
@@ -85,7 +82,7 @@ public class RequestServiceImpl implements RequestService {
         if (event.getParticipantLimit() == 0) {
             request.setStatus(RequestStatus.CONFIRMED);
             int numOfParticipants = event.getConfirmedRequests();
-            event.setConfirmedRequests(numOfParticipants + 1);                              // ПОДТВЕРЖДАТЬ УЧАСТНИКА НУЖНО ТОЛЬКО ЕСЛИ ParticipantLimit == 0
+            event.setConfirmedRequests(numOfParticipants + 1);
         }
         eventRepository.save(event);
         Request newRequest = requestRepository.save(request);

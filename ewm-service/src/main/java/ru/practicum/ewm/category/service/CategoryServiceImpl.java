@@ -35,11 +35,6 @@ public class CategoryServiceImpl implements CategoryService {
     @Transactional
     public CategoryDto updateCategory(CategoryDto categoryDto, Long catId) {
         Category existCategory = checkCategoryForExist(catId);
-        /*Category existCategory = categoryRepository.findById(catId)
-                .orElseThrow(() -> {
-                    log.warn("Category with id={} was not found", catId);
-                    throw new NotFoundException(String.format("Category with id=%d was not found", catId));
-                });*/
         if (categoryDto.getName() != null) {
             existCategory.setName(categoryDto.getName());
         }
@@ -50,13 +45,8 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
-    public void deleteCategory(Long catId) {                    // УДАЛЕНИЕ ВОЗМОЖНО ТОЛЬКО ЕСЛИ С КАТЕГОРИЕЙ НЕ СВЯЗАНО НИ ОДНОГО СОБЫТИЯ
+    public void deleteCategory(Long catId) {
         checkCategoryForExist(catId);
-        /*categoryRepository.findById(catId)
-                .orElseThrow(() -> {
-                    log.warn("Category with id={} was not found", catId);
-                    throw new NotFoundException(String.format("Category with id=%d was not found", catId));
-                });*/
         categoryRepository.deleteById(catId);
         log.info("Удалена категория id={}", catId);
     }
@@ -72,11 +62,6 @@ public class CategoryServiceImpl implements CategoryService {
     @Override
     public CategoryDto getCategoryById(Long catId) {
         Category category = checkCategoryForExist(catId);
-        /*Category category = categoryRepository.findById(catId)
-                .orElseThrow(() -> {
-                    log.warn("Category with id={} was not found", catId);
-                    throw new NotFoundException(String.format("Category with id=%d was not found", catId));
-                });*/
         log.info("Вызвана категория id={}", catId);
 
         return CategoryMapper.toCategoryDto(category);
