@@ -2,7 +2,6 @@ package ru.practicum.ewm.user;
 
 import ru.practicum.ewm.user.dto.UserDto;
 import ru.practicum.ewm.user.dto.UserShortDto;
-import ru.practicum.ewm.user.model.User;
 
 public class UserMapper {
 

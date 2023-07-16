@@ -1,20 +1,13 @@
 package ru.practicum.ewm.event.service;
 
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.ewm.category.CategoryRepository;
-import ru.practicum.ewm.category.model.Category;
-import ru.practicum.ewm.event.EventMapper;
+import ru.practicum.ewm.event.*;
 import ru.practicum.ewm.event.dto.EventFullDto;
-import ru.practicum.ewm.event.dto.EventUpdateByAdminDto;
-import ru.practicum.ewm.event.model.Event;
-import ru.practicum.ewm.event.model.EventState;
-import ru.practicum.ewm.event.model.Location;
-import ru.practicum.ewm.event.repository.EventCustomRepository;
-import ru.practicum.ewm.event.repository.EventRepository;
-import ru.practicum.ewm.event.repository.LocationRepository;
+import ru.practicum.ewm.event.dto.EventUpdateDto;
+import ru.practicum.ewm.event.location.LocationRepository;
 import ru.practicum.ewm.exception.IllegalEventStatusException;
 import ru.practicum.ewm.exception.NotFoundException;
 import ru.practicum.ewm.exception.WrongEventDateException;
@@ -27,27 +20,26 @@ import java.util.stream.Collectors;
 @Slf4j
 @Service
 @Transactional
-@RequiredArgsConstructor
-public class EventAdminServiceImpl implements EventAdminService {
+public class EventAdminServiceImpl extends EventUpdater implements EventAdminService {
 
     private final EventRepository eventRepository;
     private final EventCustomRepository eventCustomRepository;
-    private final CategoryRepository categoryRepository;
-    private final LocationRepository locationRepository;
+
+    public EventAdminServiceImpl(CategoryRepository categoryRepository, LocationRepository locationRepository,
+                                 EventCustomRepository eventCustomRepository, EventRepository eventRepository) {
+        super(categoryRepository, locationRepository);
+        this.eventRepository = eventRepository;
+        this.eventCustomRepository = eventCustomRepository;
+    }
 
     @Override
-    public EventFullDto updateEventByAdmin(Long eventId, EventUpdateByAdminDto eventUpdateByAdminDto) {
-        Event existEvent = eventRepository.findById(eventId)
-                .orElseThrow(() -> {
-                    log.warn("Event with id={} was not found", eventId);
-                    throw new NotFoundException(String.format("Event with id=%d was not found", eventId));
-                });
-        if (eventUpdateByAdminDto.getEventDate() != null) {
-            checkEventStartTime(eventUpdateByAdminDto.getEventDate());
-            existEvent.setEventDate(DateParser.parseDate(eventUpdateByAdminDto.getEventDate()));
+    public EventFullDto updateEventByAdmin(Long eventId, EventUpdateDto eventUpdateDto) {
+        Event existEvent = checkEventForExist(eventId);
+        if (eventUpdateDto.getEventDate() != null) {
+            checkAdminEventStartTime(eventUpdateDto.getEventDate());
         }
-        if (eventUpdateByAdminDto.getStateAction() != null) {
-            if (eventUpdateByAdminDto.getStateAction().equals("PUBLISH_EVENT")) {
+        if (eventUpdateDto.getStateAction() != null) {
+            if (eventUpdateDto.getStateAction().equals("PUBLISH_EVENT")) {
                 if (existEvent.getState().equals(EventState.PENDING)) {
                     existEvent.setState(EventState.PUBLISHED);
                     existEvent.setPublishedOn(LocalDateTime.now());
@@ -55,7 +47,7 @@ public class EventAdminServiceImpl implements EventAdminService {
                     log.warn("Cannot publish the event because it's not in the right state: " + existEvent.getState());
                     throw new IllegalEventStatusException("Cannot publish the event because it's not in the right state: " + existEvent.getState());
                 }
-            } else if (eventUpdateByAdminDto.getStateAction().equals("REJECT_EVENT")) {
+            } else if (eventUpdateDto.getStateAction().equals("REJECT_EVENT")) {
                 if (!existEvent.getState().equals(EventState.PUBLISHED)) {
                     existEvent.setState(EventState.CANCELED);
                 } else {
@@ -63,41 +55,14 @@ public class EventAdminServiceImpl implements EventAdminService {
                     throw new IllegalEventStatusException("Cannot reject the event because it's not in the right state: " + existEvent.getState());
                 }
             } else {
-                log.warn("Некорректный статус запроса на изменение события: {}", eventUpdateByAdminDto.getStateAction());
-                throw new IllegalEventStatusException("Некорректный статус запроса на изменение события: " + eventUpdateByAdminDto.getStateAction());
+                log.warn("Некорректный статус запроса на изменение события: {}", eventUpdateDto.getStateAction());
+                throw new IllegalEventStatusException("Некорректный статус запроса на изменение события: " + eventUpdateDto.getStateAction());
             }
         }
-        if (eventUpdateByAdminDto.getAnnotation() != null) {
-            existEvent.setAnnotation(eventUpdateByAdminDto.getAnnotation());
-        }
-        if (eventUpdateByAdminDto.getCategory() != null && !eventUpdateByAdminDto.getCategory().equals(existEvent.getCategory().getId())) {
-            Category updCategory = categoryRepository.getReferenceById(eventUpdateByAdminDto.getCategory());
-            existEvent.setCategory(updCategory);
-        }
-        if (eventUpdateByAdminDto.getDescription() != null) {
-            existEvent.setDescription(eventUpdateByAdminDto.getDescription());
-        }
-        if (eventUpdateByAdminDto.getLocation() != null) {
-            Location location = eventUpdateByAdminDto.getLocation();
-            existEvent.setLocation(location);
-            locationRepository.save(location);
-        }
-        if (eventUpdateByAdminDto.getPaid() != null) {
-            existEvent.setPaid(eventUpdateByAdminDto.getPaid());
-        }
-        if (eventUpdateByAdminDto.getParticipantLimit() != null && eventUpdateByAdminDto.getParticipantLimit() > -1) {
-            existEvent.setParticipantLimit(eventUpdateByAdminDto.getParticipantLimit());
-        }
-        if (eventUpdateByAdminDto.getParticipantLimit() != null && eventUpdateByAdminDto.getParticipantLimit() == 0) {
-            existEvent.setRequestModeration(false);
-        }
-        if (eventUpdateByAdminDto.getTitle() != null) {
-            existEvent.setTitle(eventUpdateByAdminDto.getTitle());
-        }
-        Event updEvent = eventRepository.save(existEvent);
-        log.info("Событие id={} обновлено администратором", eventId);
+        Event updEvent = this.updateEventFields(existEvent, eventUpdateDto);
+        Event savedEvent = eventRepository.save(updEvent);
 
-        return EventMapper.toEventFullDto(updEvent);
+        return EventMapper.toEventFullDto(savedEvent);
     }
 
     @Override
@@ -117,16 +82,23 @@ public class EventAdminServiceImpl implements EventAdminService {
             end = DateParser.parseDate(rangeEnd);
         }
         List<Event> eventList = eventCustomRepository.getEventsByAdmin(users, stateList, categories, start, end, from, size);
-        log.info("Администратор вызвал список событий по параметрам");
 
         return eventList.stream().map(EventMapper::toEventFullDto).collect(Collectors.toList());
     }
 
-    private void checkEventStartTime(String eventDate) {
+    private void checkAdminEventStartTime(String eventDate) {
         if (DateParser.parseDate(eventDate).isBefore(LocalDateTime.now().plusHours(1))) {
             log.warn("Начало события должно быть не ранее чем через 1 час от времени публикации");
             throw new WrongEventDateException("Начало события должно быть не ранее чем через 1 час от времени публикации");
         }
+    }
+
+    private Event checkEventForExist(Long eventId) {
+        return eventRepository.findById(eventId)
+                .orElseThrow(() -> {
+                    log.warn("Event with id={} was not found", eventId);
+                    throw new NotFoundException(String.format("Event with id=%d was not found", eventId));
+                });
     }
 
 }

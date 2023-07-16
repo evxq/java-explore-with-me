@@ -1,63 +1,77 @@
-package ru.practicum.ewm.event.dto;
+package ru.practicum.ewm.event;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.RequiredArgsConstructor;
-import ru.practicum.ewm.category.CategoryDto;
+import lombok.*;
+import ru.practicum.ewm.category.Category;
 import ru.practicum.ewm.event.location.Location;
-import ru.practicum.ewm.user.dto.UserShortDto;
+import ru.practicum.ewm.user.User;
 
+import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
+import java.time.LocalDateTime;
 
-@Data
+@Entity
+@Getter
+@Setter
 @Builder
+@ToString
 @AllArgsConstructor
 @RequiredArgsConstructor
-public class EventFullDto {
+@Table(name = "events")
+public class Event {
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Size(min = 20, max = 2000)
     @NotBlank(message = "Аннотация не может быть пустой")
     private String annotation;
 
-    @NotNull
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "category_id")
     @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
-    private CategoryDto category;
+    @ToString.Exclude
+    private Category category;
 
+    @Column(name = "confirmed_requests")
     private Integer confirmedRequests;
 
-    private String createdOn;
+    @Column(name = "created_on")
+    private LocalDateTime createdOn;
 
     @Size(min = 20, max = 7000)
     @NotBlank(message = "Описание не может быть пустым")
     private String description;
 
-    @NotNull
-    private String eventDate;
+    @Column(name = "event_date")
+    private LocalDateTime eventDate;
 
-    @NotNull
+    @ManyToOne
+    @JoinColumn(name = "initiator_id")
     @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
-    private UserShortDto initiator;
+    private User initiator;
 
-    @NotNull
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "location_id")
     @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
+    @ToString.Exclude
     private Location location;
 
-    @NotNull
     private Boolean paid;
 
+    @Column(name = "participant_limit")
     private Integer participantLimit;
 
-    private String publishedOn;
+    @Column(name = "published_on")
+    private LocalDateTime publishedOn;
 
+    @Column(name = "request_moderation")
     private Boolean requestModeration;
 
-    private String state;
+    @Enumerated(EnumType.STRING)
+    private EventState state;
 
     @Size(min = 3, max = 120)
     @NotBlank(message = "Заголовок не может быть пустым")

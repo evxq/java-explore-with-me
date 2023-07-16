@@ -1,8 +1,5 @@
 package ru.practicum.ewm.category;
 
-import ru.practicum.ewm.category.dto.CategoryDto;
-import ru.practicum.ewm.category.model.Category;
-
 public class CategoryMapper {
 
     public static CategoryDto toCategoryDto(Category category) {

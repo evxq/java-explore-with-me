@@ -5,12 +5,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import ru.practicum.ewm.event.EventMapper;
+import ru.practicum.ewm.event.*;
 import ru.practicum.ewm.event.dto.EventFullDto;
-import ru.practicum.ewm.event.model.Event;
-import ru.practicum.ewm.event.model.EventState;
-import ru.practicum.ewm.event.repository.EventCustomRepository;
-import ru.practicum.ewm.event.repository.EventRepository;
 import ru.practicum.ewm.exception.NotFoundException;
 import ru.practicum.ewm.exception.WrongParameterException;
 import ru.practicum.ewm.utility.DateParser;
@@ -82,14 +78,12 @@ public class EventPublicServiceImpl implements EventPublicService {
                     .sorted(Comparator.comparing(Event::getViews, Comparator.naturalOrder()))
                     .collect(Collectors.toList());
         }
-        log.info("Пользователь вызвал список событий по параметрам");
         statClient.addHit(HitDto.builder()
                 .app("ewm-service")
                 .uri(request.getRequestURI())
                 .ip(request.getRemoteAddr())
                 .timestamp(String.valueOf(LocalDateTime.now()))
                 .build());
-
         return eventList.stream().map(EventMapper::toEventFullDto).collect(Collectors.toList());
     }
 
@@ -108,7 +102,6 @@ public class EventPublicServiceImpl implements EventPublicService {
         if (response.getBody() != null && response.getBody().size() > 0) {
             event.setViews(response.getBody().get(0).getHits());
         }
-        log.info("Пользователь вызвал событие id={} по параметрам", eventId);
         statClient.addHit(HitDto.builder()
                 .app("ewm-service")
                 .uri(request.getRequestURI())

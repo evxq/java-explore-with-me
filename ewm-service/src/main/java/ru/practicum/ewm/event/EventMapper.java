@@ -3,11 +3,14 @@ package ru.practicum.ewm.event;
 import ru.practicum.ewm.category.CategoryMapper;
 import ru.practicum.ewm.event.dto.EventFullDto;
 import ru.practicum.ewm.event.dto.NewEventDto;
-import ru.practicum.ewm.event.model.Event;
 import ru.practicum.ewm.user.UserMapper;
 import ru.practicum.ewm.utility.DateParser;
 
 import java.time.LocalDateTime;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 public class EventMapper {
 
@@ -34,6 +37,14 @@ public class EventMapper {
                 .title(event.getTitle())
                 .views(event.getViews())
                 .build();
+    }
+
+    public static Set<EventFullDto> toEventFullDto(Collection<Event> events) {
+        Set<EventFullDto> eventSet = new HashSet<>();
+        if (events != null) {
+            eventSet = events.stream().map(EventMapper::toEventFullDto).collect(Collectors.toSet());
+        }
+        return eventSet;
     }
 
     public static Event toEvent(NewEventDto newEventDto) {
