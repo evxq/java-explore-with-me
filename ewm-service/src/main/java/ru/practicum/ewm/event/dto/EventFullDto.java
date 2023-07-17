@@ -6,12 +6,14 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import ru.practicum.ewm.category.CategoryDto;
+import ru.practicum.ewm.event.Comment.dto.CommentDto;
 import ru.practicum.ewm.event.location.Location;
 import ru.practicum.ewm.user.dto.UserShortDto;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
+import java.util.List;
 
 @Data
 @Builder
@@ -64,5 +66,7 @@ public class EventFullDto {
     private String title;
 
     private Long views;
+
+    private List<CommentDto> comments;
 
 }

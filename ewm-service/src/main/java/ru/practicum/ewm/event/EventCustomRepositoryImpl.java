@@ -15,12 +15,7 @@ import java.util.List;
 @Repository
 @RequiredArgsConstructor
 public class EventCustomRepositoryImpl implements EventCustomRepository {
-    // Привет
-    // Если имелось в виду, что в этом классе (или в интерфейсе EventCustomRepository)
-    // стоит имплементировать JpaRepository<Event, Long>,
-    // то в таком случае также требуется переопределить все встроенные методы репозитория, типа save, getById и т.д.
-    // Всего около 20 методов. Это не выглядит оптимально. Или это как раз предлагается?
-    // А без этого в любом случае потребуется 2 интерфейса репозитория - JpaRepository и Custom
+
     @PersistenceContext
     private EntityManager entityManager;
 

@@ -21,7 +21,7 @@ public class CompilationPublicController {
 
     @GetMapping("/{compilationId}")
     public CompilationDto getCompilationById(@PathVariable Long compilationId) {
-        Compilation compilationById = compilationService.getCompilationByIdWithExistChecking(compilationId);
+        Compilation compilationById = compilationService.getCompilationByIdIfExists(compilationId);
         log.info("Вызвана подборка id={}", compilationId);
         return CompilationMapper.toCompilationDto(compilationById);
 

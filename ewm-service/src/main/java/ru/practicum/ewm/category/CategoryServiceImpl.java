@@ -27,7 +27,7 @@ public class CategoryServiceImpl implements CategoryService {
     @Override
     @Transactional
     public CategoryDto updateCategory(CategoryDto categoryDto, Long categoryId) {
-        Category existCategory = getCategoryByIdWithExistChecking(categoryId);
+        Category existCategory = getCategoryByIdIfExists(categoryId);
         if (categoryDto.getName() != null) {
             existCategory.setName(categoryDto.getName());
         }
@@ -37,7 +37,7 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     public void deleteCategory(Long categoryId) {
-        getCategoryByIdWithExistChecking(categoryId);
+        getCategoryByIdIfExists(categoryId);
         categoryRepository.deleteById(categoryId);
     }
 
@@ -48,7 +48,7 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
-    public Category getCategoryByIdWithExistChecking(Long categoryId) {
+    public Category getCategoryByIdIfExists(Long categoryId) {
         return categoryRepository.findById(categoryId)
                 .orElseThrow(() -> {
                     log.warn("Category with id={} was not found", categoryId);

@@ -28,7 +28,7 @@ public class CategoryPublicController {
 
     @GetMapping("/{categoryId}")
     public CategoryDto getCategoryById(@PathVariable Long categoryId) {
-        Category categoryById = categoryService.getCategoryByIdWithExistChecking(categoryId);
+        Category categoryById = categoryService.getCategoryByIdIfExists(categoryId);
         log.info("Вызвана категория id={}", categoryId);
         return CategoryMapper.toCategoryDto(categoryById);
     }

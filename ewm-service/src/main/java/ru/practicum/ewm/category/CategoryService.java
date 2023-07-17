@@ -10,7 +10,7 @@ public interface CategoryService {
 
     List<CategoryDto> getAllCategories(Integer from, Integer size);
 
-    Category getCategoryByIdWithExistChecking(Long categoryId);
+    Category getCategoryByIdIfExists(Long categoryId);
 
     void deleteCategory(Long categoryId);
 
