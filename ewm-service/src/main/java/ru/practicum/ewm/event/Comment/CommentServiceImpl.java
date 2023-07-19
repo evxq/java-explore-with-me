@@ -27,10 +27,6 @@ public class CommentServiceImpl implements CommentService {
 
     @Override
     public CommentDto addComment(Long userId, Long eventId, CommentDto commentDto) {
-        if (commentDto.getText().isEmpty()) {
-            log.info("Комментарий не может быть пустым");
-            throw new WrongParameterException("Комментарий не может быть пустым");
-        }
         User author = checkUserForExist(userId);
         Event event = eventRepository.findById(eventId)
                 .orElseThrow(() -> {
@@ -46,11 +42,7 @@ public class CommentServiceImpl implements CommentService {
     }
 
     @Override
-    public CommentDto fixComment(Long userId, Long eventId, Long commentId, FixCommentDto fixCommentDto) {
-        if (fixCommentDto.getText().isEmpty()) {
-            log.info("Комментарий не может быть пустым");
-            throw new WrongParameterException("Комментарий не может быть пустым");
-        }
+    public CommentDto fixComment(Long userId, Long commentId, FixCommentDto fixCommentDto) {
         User author = checkUserForExist(userId);
         Comment existComment = checkCommentForExistAndAuthor(commentId, author);
         if (fixCommentDto.getText() != null) {

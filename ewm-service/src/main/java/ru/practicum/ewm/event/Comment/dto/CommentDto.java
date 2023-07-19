@@ -1,7 +1,12 @@
 package ru.practicum.ewm.event.Comment.dto;
 
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 
 @Data
@@ -11,6 +16,8 @@ import java.time.LocalDateTime;
 public class CommentDto {
 
     private Long id;
+    @NotNull
+    @NotBlank(message = "Комментарий не может быть пустым")
     private String text;
     private String eventTitle;
     private String authorName;

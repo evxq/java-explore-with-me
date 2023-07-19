@@ -7,7 +7,7 @@ public interface CommentService {
 
     CommentDto addComment(Long userId, Long eventId, CommentDto commentDto);
 
-    CommentDto fixComment(Long userId, Long eventId, Long commentId, FixCommentDto fixCommentDto);
+    CommentDto fixComment(Long userId, Long commentId, FixCommentDto fixCommentDto);
 
     void deleteComment(Long userId, Long commentId);
 

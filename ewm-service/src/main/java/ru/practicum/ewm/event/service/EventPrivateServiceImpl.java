@@ -4,6 +4,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.ewm.category.CategoryRepository;
+import ru.practicum.ewm.event.Comment.CommentMapper;
+import ru.practicum.ewm.event.Comment.CommentRepository;
+import ru.practicum.ewm.event.Comment.dto.CommentDto;
 import ru.practicum.ewm.event.Event;
 import ru.practicum.ewm.event.EventMapper;
 import ru.practicum.ewm.event.EventRepository;
@@ -33,8 +36,9 @@ public class EventPrivateServiceImpl extends EventUpdater implements EventPrivat
     private final UserRepository userRepository;
 
     public EventPrivateServiceImpl(CategoryRepository categoryRepository, LocationRepository locationRepository,
-                                   EventRepository eventRepository, UserRepository userRepository) {
-        super(categoryRepository, locationRepository);
+                                   EventRepository eventRepository, UserRepository userRepository,
+                                   CommentRepository commentRepository) {
+        super(categoryRepository, locationRepository, commentRepository);
         this.eventRepository = eventRepository;
         this.userRepository = userRepository;
     }
@@ -84,7 +88,7 @@ public class EventPrivateServiceImpl extends EventUpdater implements EventPrivat
             log.warn("Only pending or canceled events can be changed");
             throw new IllegalEventStatusException("Only pending or canceled events can be changed");
         }
-        Event updEvent = this.updateEventFields(existEvent, eventUpdateDto);
+        Event updEvent = updateEventFields(existEvent, eventUpdateDto);
         Event savedEvent = eventRepository.save(updEvent);
 
         return EventMapper.toEventFullDto(savedEvent);
@@ -93,17 +97,17 @@ public class EventPrivateServiceImpl extends EventUpdater implements EventPrivat
     @Override
     public List<EventFullDto> getAllEventsByUser(Long userId, Integer from, Integer size) {
         return eventRepository.findAllByInitiatorId(userId, PageQualifier.definePage(from, size))
-                .stream().map(EventMapper::toEventFullDto).collect(Collectors.toList());
+                .stream().map(this::setCommentsToEvent).collect(Collectors.toList());
     }
 
     @Override
     public EventFullDto getEventByUser(Long userId, Long eventId) {
         Event event = checkEventForExist(eventId);
         if (!event.getInitiator().getId().equals(userId)) {
-            log.warn("");
+            log.warn("Пользователь id={} не добавлял событие id={}", userId, eventId);
             throw new NotFoundException(String.format("Пользователь id=%d не добавлял событие id=%d", userId, eventId));
         }
-        return EventMapper.toEventFullDto(event);
+        return setCommentsToEvent(event);
     }
 
     private void checkUserEventStartTime(String eventDate) {

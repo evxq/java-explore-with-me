@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.ewm.category.CategoryRepository;
 import ru.practicum.ewm.event.*;
+import ru.practicum.ewm.event.Comment.CommentRepository;
 import ru.practicum.ewm.event.dto.EventFullDto;
 import ru.practicum.ewm.event.dto.EventUpdateDto;
 import ru.practicum.ewm.event.location.LocationRepository;
@@ -26,8 +27,9 @@ public class EventAdminServiceImpl extends EventUpdater implements EventAdminSer
     private final EventCustomRepository eventCustomRepository;
 
     public EventAdminServiceImpl(CategoryRepository categoryRepository, LocationRepository locationRepository,
-                                 EventCustomRepository eventCustomRepository, EventRepository eventRepository) {
-        super(categoryRepository, locationRepository);
+                                 EventCustomRepository eventCustomRepository, EventRepository eventRepository,
+                                 CommentRepository commentRepository) {
+        super(categoryRepository, locationRepository, commentRepository);
         this.eventRepository = eventRepository;
         this.eventCustomRepository = eventCustomRepository;
     }
@@ -83,7 +85,7 @@ public class EventAdminServiceImpl extends EventUpdater implements EventAdminSer
         }
         List<Event> eventList = eventCustomRepository.getEventsByAdmin(users, stateList, categories, start, end, from, size);
 
-        return eventList.stream().map(EventMapper::toEventFullDto).collect(Collectors.toList());
+        return eventList.stream().map(this::setCommentsToEvent).collect(Collectors.toList());
     }
 
     private void checkAdminEventStartTime(String eventDate) {
