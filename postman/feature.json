@@ -555,7 +555,7 @@
 					"variable": [
 						{
 							"key": "id",
-							"value": "1",
+							"value": "{{uid}}",
 							"description": "(Required) id события"
 						}
 					]
