@@ -58,6 +58,17 @@ public class CommentServiceImpl implements CommentService {
         commentRepository.delete(existComment);
     }
 
+    @Override
+    public CommentDto getCommentById(Long userId, Long commentId) {
+        checkUserForExist(userId);
+        Comment comment = commentRepository.findById(commentId)
+                .orElseThrow(() -> {
+                    log.warn("Comment with id={} was not found", commentId);
+                    throw new NotFoundException(String.format("Comment with id=%d was not found", commentId));
+                });
+        return CommentMapper.toCommentDto(comment);
+    }
+
     private User checkUserForExist(Long userId) {
         return userRepository.findById(userId)
                 .orElseThrow(() -> {

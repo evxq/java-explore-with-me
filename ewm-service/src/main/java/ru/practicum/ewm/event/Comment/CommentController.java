@@ -14,7 +14,7 @@ import javax.validation.Valid;
 @Validated
 @RestController
 @RequiredArgsConstructor
-@RequestMapping(path = "/users/{userId}/comments")
+@RequestMapping(path = "/users/{userId}/comments")      // ПРИ УДАЛЕНИИ СОБЫТИЯ УДАЛИТЬ ЕГО КОММЕНТАРИИ !!!
 public class CommentController {
 
     private final CommentService commentService;
@@ -44,6 +44,14 @@ public class CommentController {
                               @PathVariable Long commentId) {
         commentService.deleteComment(userId, commentId);
         log.info("Пользователь id={} удалил комментарий id={}", userId, commentId);
+    }
+
+    @GetMapping("/{commentId}")
+    public CommentDto getCommentById(@PathVariable Long userId,
+                                     @PathVariable Long commentId) {
+        CommentDto comment = commentService.getCommentById(userId, commentId);
+        log.info("Пользователь id={} вызвал комментарий id={}", userId, commentId);
+        return comment;
     }
 
 }
