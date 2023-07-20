@@ -4,11 +4,19 @@ import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import ru.practicum.ewm.category.Category;
 import ru.practicum.ewm.category.CategoryRepository;
+import ru.practicum.ewm.event.Comment.CommentMapper;
+import ru.practicum.ewm.event.Comment.CommentRepository;
+import ru.practicum.ewm.event.Comment.dto.CommentDto;
 import ru.practicum.ewm.event.Event;
+import ru.practicum.ewm.event.EventMapper;
+import ru.practicum.ewm.event.dto.EventFullDto;
 import ru.practicum.ewm.event.dto.EventUpdateDto;
 import ru.practicum.ewm.event.location.Location;
 import ru.practicum.ewm.event.location.LocationRepository;
 import ru.practicum.ewm.utility.DateParser;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Data
 @RequiredArgsConstructor
@@ -16,8 +24,9 @@ abstract class EventUpdater {
 
     private final CategoryRepository categoryRepository;
     private final LocationRepository locationRepository;
+    private final CommentRepository commentRepository;
 
-    public Event updateEventFields(Event event, EventUpdateDto eventUpdateDto) {
+    protected Event updateEventFields(Event event, EventUpdateDto eventUpdateDto) {
         if (eventUpdateDto.getAnnotation() != null) {
             event.setAnnotation(eventUpdateDto.getAnnotation());
         }
@@ -49,6 +58,17 @@ abstract class EventUpdater {
             event.setTitle(eventUpdateDto.getTitle());
         }
         return event;
+    }
+
+    protected EventFullDto setCommentsToEvent(Event event) {
+        EventFullDto eventFullDto = EventMapper.toEventFullDto(event);
+        List<CommentDto> commentList =
+                commentRepository.findAllByEventId(event.getId()).stream()
+                        .map(CommentMapper::toCommentDto)
+                        .collect(Collectors.toList());
+        eventFullDto.setComments(commentList);
+
+        return eventFullDto;
     }
 
 }

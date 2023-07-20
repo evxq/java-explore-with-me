@@ -16,6 +16,6 @@ public interface CompilationService {
 
     List<CompilationDto> getAllCompilations(Boolean pinned, Integer from, Integer size);
 
-    Compilation getCompilationByIdWithExistChecking(Long compilationId);
+    Compilation getCompilationByIdIfExists(Long compilationId);
 
 }

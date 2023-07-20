@@ -1,12 +1,14 @@
 package ru.practicum.ewm.event.service;
 
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ru.practicum.ewm.category.CategoryRepository;
+import ru.practicum.ewm.event.Comment.CommentRepository;
 import ru.practicum.ewm.event.*;
 import ru.practicum.ewm.event.dto.EventFullDto;
+import ru.practicum.ewm.event.location.LocationRepository;
 import ru.practicum.ewm.exception.NotFoundException;
 import ru.practicum.ewm.exception.WrongParameterException;
 import ru.practicum.ewm.utility.DateParser;
@@ -24,12 +26,20 @@ import java.util.stream.Collectors;
 @Slf4j
 @Service
 @Transactional
-@RequiredArgsConstructor
-public class EventPublicServiceImpl implements EventPublicService {
+public class EventPublicServiceImpl extends EventUpdater implements EventPublicService {
 
     private final EventRepository eventRepository;
     private final EventCustomRepository eventCustomRepository;
     private final StatClient statClient;
+
+    public EventPublicServiceImpl(CategoryRepository categoryRepository, LocationRepository locationRepository,
+                                  CommentRepository commentRepository, EventRepository eventRepository,
+                                  EventCustomRepository eventCustomRepository, StatClient statClient) {
+        super(categoryRepository, locationRepository, commentRepository);
+        this.eventRepository = eventRepository;
+        this.eventCustomRepository = eventCustomRepository;
+        this.statClient = statClient;
+    }
 
     @Override
     public List<EventFullDto> getRequiredPublicEvents(HttpServletRequest request, String text, List<Long> categories, Boolean paid,
@@ -84,7 +94,7 @@ public class EventPublicServiceImpl implements EventPublicService {
                 .ip(request.getRemoteAddr())
                 .timestamp(String.valueOf(LocalDateTime.now()))
                 .build());
-        return eventList.stream().map(EventMapper::toEventFullDto).collect(Collectors.toList());
+        return eventList.stream().map(this::setCommentsToEvent).collect(Collectors.toList());
     }
 
     @Override
@@ -108,7 +118,7 @@ public class EventPublicServiceImpl implements EventPublicService {
                 .ip(request.getRemoteAddr())
                 .timestamp(String.valueOf(LocalDateTime.now()))
                 .build());
-        return EventMapper.toEventFullDto(event);
+        return setCommentsToEvent(event);
     }
 
 }

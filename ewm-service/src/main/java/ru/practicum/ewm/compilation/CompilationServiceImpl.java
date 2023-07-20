@@ -43,7 +43,7 @@ public class CompilationServiceImpl implements CompilationService {
 
     @Override
     public CompilationDto updateCompilation(Long compilationId, UpdateCompilationRequest compilationToUpdate) {
-        Compilation existCompilation = getCompilationByIdWithExistChecking(compilationId);
+        Compilation existCompilation = getCompilationByIdIfExists(compilationId);
         if (compilationToUpdate.getEvents() != null) {
             Set<Event> newEventSet = eventRepository.findAllByIdIn(compilationToUpdate.getEvents());
             existCompilation.setEvents(newEventSet);
@@ -61,7 +61,7 @@ public class CompilationServiceImpl implements CompilationService {
 
     @Override
     public void deleteCompilation(Long compilationId) {
-        getCompilationByIdWithExistChecking(compilationId);
+        getCompilationByIdIfExists(compilationId);
         compilationRepository.deleteById(compilationId);
     }
 
@@ -77,7 +77,7 @@ public class CompilationServiceImpl implements CompilationService {
     }
 
     @Override
-    public Compilation getCompilationByIdWithExistChecking(Long compilationId) {
+    public Compilation getCompilationByIdIfExists(Long compilationId) {
         return compilationRepository.findById(compilationId)
                 .orElseThrow(() -> {
                     log.warn("Compilation with id={} was not found", compilationId);
